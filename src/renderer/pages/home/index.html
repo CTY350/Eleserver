@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Eleserver</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="renderer.js" defer></script>
+</head>
+<body>
+    <header class="header">
+        <h1>Servers</h1>
+    </header>
+    <main class="main">
+         <div class="toolbar">
+        <button class="create-button">
+            <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round">
+                <path d="M12 5V19"/>
+                <path d="M5 12H19"/>
+            </svg>
+            <span>Create</span>
+        </button>
+         </div>
+        <div class="server-container">
+
+        </div>
+    </main>
+    <div class="overlay hidden">
+        <div class="pop-up">
+            <header>
+                <button class="back-button">
+                    <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            width="20"
+                            height="20"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2.5"
+                            stroke-linecap="round"
+                            stroke-linejoin="round">
+                        <path d="M15 18L9 12L15 6"/>
+                    </svg>
+                </button>
+                <h1>Create Server</h1>
+            </header>
+            <main class="pop-up-content">
+                <div class="field">
+                    <label for="server-name">Server Name</label>
+                    <input type="text" id="server-name" placeholder="Server Name">
+                </div>
+                <div class="field">
+                    <label for="server-software">Server Software</label>
+                    <select id="server-software"></select>
+                </div>
+                <div class="field">
+                    <label for="server-version">Version</label>
+                    <select id="server-version"></select>
+                </div>
+            </main>
+            <footer class="footer">
+                <button>Create</button>
+            </footer>
+        </div>
+    </div>
+</body>
+</html>

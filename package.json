@@ -1,0 +1,22 @@
+{
+  "name": "eleserver",
+  "version": "1.0.0",
+  "description": "Local minecraft server manager.",
+  "main": "src/main/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "keywords": [],
+  "author": "Ömer Faruk Duman",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "electron": "^43.1.1"
+  },
+  "dependencies": {
+    "@achingbrain/nat-port-mapper": "^4.0.5",
+    "extract-zip": "^2.0.1",
+    "nat-upnp": "^1.1.1"
+  }
+}
