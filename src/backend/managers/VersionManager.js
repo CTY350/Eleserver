@@ -2,9 +2,15 @@ import {versionPaths} from '../paths.js';
 import {writeFile} from 'node:fs/promises';
 import {readFile} from 'node:fs/promises';
 import {endpoints} from "../endpoints.js";
+import {XMLParser} from "fast-xml-parser";
 
 
 export class VersionManager {
+
+    static DownloadTypes = Object.freeze({
+        SERVER: "server",
+        INSTALLER: "installer"
+    })
 
     async #updateVersionCache(software, newVersions) {
         if (!(software in versionPaths)) {
@@ -22,7 +28,15 @@ export class VersionManager {
             if (!response.ok) {
                 throw new Error(`Failed to fetch versions for: ${software}`);
             }
-            const data = await response.json();
+
+            let data;
+            if (software === "neoforge") {
+                parser = new XMLParser();
+                data = parser.parse(await response.text());
+            } else {
+                data = await response.json()
+            };
+
             await this.#updateVersionCache(software, data);
             return data;
         }
@@ -82,6 +96,11 @@ export class VersionManager {
         return result;
     }
 
+    async getNeoForgeVersions() {
+        const response = await this.#fetchVersions("neoforge");
+    }
+
+
     async updateJavaCache(version,javaVersion)  {
 
         const cache = JSON.parse(await readFile(versionPaths["java"], "utf8"));
@@ -119,6 +138,7 @@ export class VersionManager {
         throw new Error("Invalid javaVersion");
     }
     async getServerDownloadUrl(software,version) {
+
         switch (software) {
             case "vanilla": {
                 const response = await this.#fetchVersions("vanilla");
@@ -126,7 +146,10 @@ export class VersionManager {
                     if (versionInfo.id === version) {
                         const urlResult = await fetch(versionInfo.url);
                         const versionData = await urlResult.json();
-                        return versionData.downloads.server.url;
+                        return {
+                            "downloadUrl": versionData.downloads.server.url,
+                            "downloadType": VersionManager.DownloadTypes.SERVER
+                        };
                     }
                 }
                 break;
@@ -155,7 +178,10 @@ export class VersionManager {
                     }
                 }
                 if (!installerVersion) {installerVersion = installerData[0].version}
-                return `https://meta.fabricmc.net/v2/versions/loader/${version}/${loaderVersion}/${installerVersion}/server/jar`
+                return {
+                    "downloadUrl":`https://meta.fabricmc.net/v2/versions/loader/${version}/${loaderVersion}/${installerVersion}/server/jar`,
+                    "downloadType": VersionManager.DownloadTypes.SERVER
+                }
             }
             case "paper": {
                 const builds = await fetch(`https://fill.papermc.io/v3/projects/paper/versions/${version}/builds`);
@@ -165,10 +191,16 @@ export class VersionManager {
                         return buildInfo.downloads["server:default"].url
                     }
                 }
-                return buildData[0].downloads["server:default"].url
+                return {
+                    "downloadUrl": buildData[0].downloads["server:default"].url,
+                    "downloadType": VersionManager.DownloadTypes.SERVER
+                }
             }
             case "purpur": {
-                return `https://api.purpurmc.org/v2/purpur/${version}/latest/download`;
+                return {
+                    "downloadUrl": `https://api.purpurmc.org/v2/purpur/${version}/latest/download`,
+                    "downloadType": VersionManager.DownloadTypes.SERVER
+                };
             }
         }
     }
