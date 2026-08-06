@@ -31,7 +31,7 @@ export class VersionManager {
 
             let data;
             if (software === "neoforge") {
-                parser = new XMLParser();
+                const parser = new XMLParser();
                 data = parser.parse(await response.text());
             } else {
                 data = await response.json()
@@ -41,6 +41,7 @@ export class VersionManager {
             return data;
         }
         catch (error) {
+            console.error(error);
             try {
                 const cache = await readFile(versionPaths[software], 'utf8');
                 return JSON.parse(cache);
@@ -205,3 +206,6 @@ export class VersionManager {
         }
     }
 }
+
+const versionManager = new VersionManager();
+versionManager.getNeoForgeVersions()

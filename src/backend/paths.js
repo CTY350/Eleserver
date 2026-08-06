@@ -20,4 +20,5 @@ export const versionPaths = {
     paper: path.join(baseVersionPath, "paper.json"),
     purpur: path.join(baseVersionPath, "purpur.json"),
     java: path.join(baseVersionPath, "java.json"),
+    neoforge: path.join(baseVersionPath, "neoforge.json"),
 }
