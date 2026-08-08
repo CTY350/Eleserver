@@ -54,6 +54,31 @@ export class VersionManager {
     }
 
 
+
+    async #getNeoForgeBuilds(version) {
+        const response = await this.#fetchVersions("neoforge");
+        const neoVersion = version.split(".");
+        const builds = [];
+
+        for (const build of response.metadata.versioning.versions.version) {
+            const neoBuild = build.split(".");
+
+            if (parseInt(neoBuild[0]) < 26) {
+                if (neoVersion[1] === neoBuild[0] && neoVersion[2] === neoBuild[1]) {
+                    builds.push(build);
+                }
+            }
+            else {
+                if (neoVersion[0] === neoBuild[0] && neoVersion[1] === neoBuild[1] && neoVersion[2] === neoBuild[2]) {
+                    builds.push(build);
+                }
+            }
+
+        }
+        return builds;
+    }
+
+
     async getVanillaVersions() {
         const response = await this.#fetchVersions("vanilla");
         const result = []
@@ -99,6 +124,30 @@ export class VersionManager {
 
     async getNeoForgeVersions() {
         const response = await this.#fetchVersions("neoforge");
+        const versions = new Set();
+
+        for (const version of response.metadata.versioning.versions.version) {
+            const neoVersion = version.split(".");
+            if (neoVersion[0] === "0") {
+                neoVersion.shift();
+                neoVersion.pop();
+                versions.add(neoVersion.join("."));
+                continue;
+            }
+
+            const neoVersionInt = neoVersion.map(Number);
+
+            if (neoVersionInt[0] < 26) {
+                neoVersionInt.unshift(1);
+            }
+
+            neoVersionInt.pop();
+
+            if (neoVersionInt.length > 3) {neoVersionInt.pop()}
+
+            versions.add(neoVersionInt.join("."));
+        }
+        return [...versions];
     }
 
 
@@ -206,6 +255,3 @@ export class VersionManager {
         }
     }
 }
-
-const versionManager = new VersionManager();
-versionManager.getNeoForgeVersions()
