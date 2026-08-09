@@ -53,27 +53,34 @@ export class VersionManager {
         }
     }
 
+    #neoForgetoMinecraft(build) {
+        const buildVersion = build.split(".");
 
+        if (buildVersion[0] === "0") {
+            buildVersion.shift();
+            buildVersion.pop();
+            return buildVersion.join(".");
+        }
+
+        const buildVersionInt = buildVersion.map(Number);
+
+        if (buildVersionInt[0] < 26) {
+            buildVersionInt.unshift(1);
+        }
+        buildVersionInt.pop();
+        if (buildVersionInt.length > 3) {buildVersionInt.pop()};
+        return buildVersionInt.join(".");
+    }
 
     async #getNeoForgeBuilds(version) {
         const response = await this.#fetchVersions("neoforge");
-        const neoVersion = version.split(".");
-        const builds = [];
+        const builds =  [];
 
         for (const build of response.metadata.versioning.versions.version) {
-            const neoBuild = build.split(".");
-
-            if (parseInt(neoBuild[0]) < 26) {
-                if (neoVersion[1] === neoBuild[0] && neoVersion[2] === neoBuild[1]) {
-                    builds.push(build);
-                }
+            const mcVersion = this.#neoForgetoMinecraft(build);
+            if (mcVersion === version) {
+                builds.push(build);
             }
-            else {
-                if (neoVersion[0] === neoBuild[0] && neoVersion[1] === neoBuild[1] && neoVersion[2] === neoBuild[2]) {
-                    builds.push(build);
-                }
-            }
-
         }
         return builds;
     }
@@ -127,25 +134,8 @@ export class VersionManager {
         const versions = new Set();
 
         for (const version of response.metadata.versioning.versions.version) {
-            const neoVersion = version.split(".");
-            if (neoVersion[0] === "0") {
-                neoVersion.shift();
-                neoVersion.pop();
-                versions.add(neoVersion.join("."));
-                continue;
-            }
-
-            const neoVersionInt = neoVersion.map(Number);
-
-            if (neoVersionInt[0] < 26) {
-                neoVersionInt.unshift(1);
-            }
-
-            neoVersionInt.pop();
-
-            if (neoVersionInt.length > 3) {neoVersionInt.pop()}
-
-            versions.add(neoVersionInt.join("."));
+            const mcVersion = this.#neoForgetoMinecraft(version);
+            versions.add(mcVersion);
         }
         return [...versions];
     }
@@ -251,6 +241,33 @@ export class VersionManager {
                     "downloadUrl": `https://api.purpurmc.org/v2/purpur/${version}/latest/download`,
                     "downloadType": VersionManager.DownloadTypes.SERVER
                 };
+            }
+            case "neoforge": {
+                const builds = await this.#getNeoForgeBuilds(version);
+
+                const stableVersions= new Map();
+                const unstableVersions = new Map();
+
+                for (const build of builds) {
+                    const buildVersion = build.split(".");
+                    const buildValue = buildVersion.at(-1);
+
+                    const buildVersionInt = buildVersion.map(Number);
+                    const buildNumber = buildVersionInt.at(-1);
+
+                    if (Number.isNaN(buildNumber)) {
+                        const betaBuild = buildValue.split("-");
+                        unstableVersions.set(betaBuild[0], build);
+                    }
+                    else {
+                        stableVersions.set(buildNumber, build);
+                    }
+                }
+                const latest = stableVersions.get(Math.max(...stableVersions.keys())) ?? unstableVersions.get(Math.max(...unstableVersions.keys()));
+                return {
+                    "downloadUrl": `https://maven.neoforged.net/releases/net/neoforged/neoforge/${latest}/neoforge-${latest}-installer.jar`,
+                    "downloadType": VersionManager.DownloadTypes.INSTALLER
+                }
             }
         }
     }
