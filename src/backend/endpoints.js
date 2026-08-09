@@ -3,5 +3,6 @@ export const endpoints = {
     fabric: "https://meta.fabricmc.net/v2/versions/game",
     paper: "https://fill.papermc.io/v3/projects/paper",
     purpur: "https://api.purpurmc.org/v2/purpur",
-    neoforge: "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml"
+    neoforge: "https://maven.neoforged.net/releases/net/neoforged/neoforge/maven-metadata.xml",
+    forge: "https://maven.minecraftforge.net/net/minecraftforge/forge/maven-metadata.xml"
 }

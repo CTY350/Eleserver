@@ -30,12 +30,12 @@ export class VersionManager {
             }
 
             let data;
-            if (software === "neoforge") {
+            if (software === "neoforge" || software === "forge") {
                 const parser = new XMLParser();
                 data = parser.parse(await response.text());
             } else {
                 data = await response.json()
-            };
+            }
 
             await this.#updateVersionCache(software, data);
             return data;
@@ -79,6 +79,18 @@ export class VersionManager {
         for (const build of response.metadata.versioning.versions.version) {
             const mcVersion = this.#neoForgetoMinecraft(build);
             if (mcVersion === version) {
+                builds.push(build);
+            }
+        }
+        return builds;
+    }
+
+    async getForgeBuilds(version) {
+        const response = await this.#fetchVersions("forge");
+        const builds =  [];
+        for (const build of response.metadata.versioning.versions.version) {
+            const versions = build.split("-");
+            if (versions[0] === version) {
                 builds.push(build);
             }
         }
@@ -138,6 +150,34 @@ export class VersionManager {
             versions.add(mcVersion);
         }
         return [...versions];
+    }
+
+    async getForgeVersions() {
+        const response = await this.#fetchVersions("forge");
+        const versions = new Set();
+        for (const version of response.metadata.versioning.versions.version) {
+            const mcVersion = version.split("-");
+            versions.add(mcVersion[0]);
+        }
+        return [...versions].sort((a,b) => {
+            const mcVersionA = a.split(".");
+            const mcVersionB = b.split(".");
+
+            if (mcVersionA.length <= 2) {
+                mcVersionA.push(0)
+            }
+            if (mcVersionB.length <= 2) {
+                mcVersionB.push(0)
+            }
+
+            if (mcVersionA[0] !== mcVersionB[0]) {
+                return mcVersionB[0] - mcVersionA[0];
+            }
+            if (mcVersionA[1] !== mcVersionB[1]) {
+                return mcVersionB[1] - mcVersionA[1];
+            }
+            return mcVersionB[2] - mcVersionA[2];
+        });
     }
 
 
@@ -269,6 +309,7 @@ export class VersionManager {
                     "downloadType": VersionManager.DownloadTypes.INSTALLER
                 }
             }
+
         }
     }
 }
