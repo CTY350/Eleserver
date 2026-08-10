@@ -7,6 +7,7 @@ import {createWriteStream} from 'node:fs';
 import {basePaths} from '../paths.js'
 import path from 'path';
 import {spawn} from 'child_process';
+import os from 'node:os';
 
 const versionManager = new VersionManager();
 const javaManager = new JavaManager();
@@ -20,12 +21,32 @@ export class ServerManager {
     // ━━━━━━━━━━━━━━━━━━━━━━
 
     async #installServer(software, version) {
-        const url = await versionManager.getServerDownloadUrl(software, version);
+        const data = await versionManager.getServerDownloadUrl(software, version);
+        const url = data.downloadUrl;
+        const type = data.downloadType;
         const response = await fetch(url);
-        const dir = path.join(basePaths.downloads, software, String(version));
-        await mkdir(dir, {recursive: true});
-        const file = createWriteStream(path.join(dir, "server.jar"));
-        await pipeline(response.body, file);
+        if (type === "server") {
+            const dir = path.join(basePaths.downloads, software, String(version));
+            await mkdir(dir, {recursive: true});
+            const file = createWriteStream(path.join(dir, "server.jar"));
+            await pipeline(response.body, file);
+        }
+        else if (type === "installer") {
+            const dir = path.join(os.tmpdir(), "Eleserver");
+            await mkdir(dir, {recursive: true});
+            const file = createWriteStream(path.join(dir, "installer.jar"));
+            await pipeline(response.body, file);
+            const java = await javaManager.ensureJava(await versionManager.getJavaVersion(version));
+            spawn(
+                java, [
+                    "-jar",
+                    path.join(dir, "installer.jar"),
+                    "--installServer"
+                ]
+            )
+
+            await rmdir(dir, {recursive: true});
+        }
     }
 
     async #locateServer(software, version) {
@@ -233,3 +254,5 @@ export class ServerManager {
     }
 }
 
+const server = new ServerManager();
+await server.createServer("fabric","26.2");

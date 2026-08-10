@@ -85,7 +85,7 @@ export class VersionManager {
         return builds;
     }
 
-    async getForgeBuilds(version) {
+    async #getForgeBuilds(version) {
         const response = await this.#fetchVersions("forge");
         const builds =  [];
         for (const build of response.metadata.versioning.versions.version) {
@@ -94,7 +94,19 @@ export class VersionManager {
                 builds.push(build);
             }
         }
-        return builds;
+        return builds.sort((a, b) => {
+            const buildA = a.split("-")[1].split(".").map(Number);
+            const buildB = b.split("-")[1].split(".").map(Number);
+
+            if (buildA[0] !== buildB[0]) {
+                return buildB[0] - buildA[0];
+            }
+            if (buildA[1] !== buildB[1]) {
+                return buildB[1] - buildA[1];
+            }
+
+            return buildB[2] - buildA[2];
+        });
     }
 
 
@@ -163,20 +175,31 @@ export class VersionManager {
             const mcVersionA = a.split(".");
             const mcVersionB = b.split(".");
 
-            if (mcVersionA.length <= 2) {
-                mcVersionA.push(0)
+            const mcVersionAInt = mcVersionA.map(Number);
+            const mcVersionBInt = mcVersionB.map(Number);
+
+            if (mcVersionAInt.length <= 2) {
+                mcVersionAInt.push(0)
             }
-            if (mcVersionB.length <= 2) {
-                mcVersionB.push(0)
+            if (mcVersionBInt.length <= 2) {
+                mcVersionBInt.push(0)
             }
 
-            if (mcVersionA[0] !== mcVersionB[0]) {
-                return mcVersionB[0] - mcVersionA[0];
+            if (Number.isNaN(mcVersionAInt[2])) {
+                const newVersion = mcVersionA[2].split("_").map(Number);
+                mcVersionAInt[2] = newVersion[0];
+            } else if (Number.isNaN(mcVersionBInt[2])) {
+                const newVersion = mcVersionB[2].split("_").map(Number);
+                mcVersionBInt[2] = newVersion[0];
             }
-            if (mcVersionA[1] !== mcVersionB[1]) {
-                return mcVersionB[1] - mcVersionA[1];
+
+            if (mcVersionAInt[0] !== mcVersionBInt[0]) {
+                return mcVersionBInt[0] - mcVersionAInt[0];
             }
-            return mcVersionB[2] - mcVersionA[2];
+            if (mcVersionAInt[1] !== mcVersionBInt[1]) {
+                return mcVersionBInt[1] - mcVersionAInt[1];
+            }
+            return mcVersionBInt[2] - mcVersionAInt[2];
         });
     }
 
@@ -215,7 +238,7 @@ export class VersionManager {
                 return javaVersion;
             }
         }
-        throw new Error("Invalid javaVersion");
+        throw new Error("Invalid JavaVersion");
     }
     async getServerDownloadUrl(software,version) {
 
@@ -309,7 +332,13 @@ export class VersionManager {
                     "downloadType": VersionManager.DownloadTypes.INSTALLER
                 }
             }
-
+            case "forge": {
+                const latest = (await this.#getForgeBuilds(version))[0];
+                return {
+                    "downloadUrl": `https://maven.minecraftforge.net/net/minecraftforge/forge/${latest}/forge-${latest}-installer.jar`,
+                    "downloadType": VersionManager.DownloadTypes.INSTALLER
+                }
+            }
         }
     }
 }
