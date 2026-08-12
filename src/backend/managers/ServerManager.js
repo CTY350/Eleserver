@@ -1,4 +1,4 @@
-import {writeFile,mkdir,readFile,readdir,rm} from "node:fs/promises";
+import {writeFile,mkdir,readFile,readdir,rm,access,cp} from "node:fs/promises";
 import {randomBytes} from "node:crypto";
 import {VersionManager} from "./versionManager.js";
 import {JavaManager} from './JavaManager.js';
@@ -8,6 +8,7 @@ import {basePaths} from '../paths.js'
 import path from 'path';
 import {spawn} from 'child_process';
 import os from 'node:os';
+import * as constants from "node:constants";
 
 const versionManager = new VersionManager();
 const javaManager = new JavaManager();
@@ -25,6 +26,10 @@ export class ServerManager {
         const url = data.downloadUrl;
         const type = data.downloadType;
         const response = await fetch(url);
+        console.log("status:",response.status);
+        console.log("type:",response.headers.get("content-type"));
+        console.log("length:", response.headers.get("content-length"));
+
         if (type === "server") {
             const dir = path.join(basePaths.downloads, software, String(version));
             await mkdir(dir, {recursive: true});
@@ -37,15 +42,32 @@ export class ServerManager {
             const file = createWriteStream(path.join(dir, "installer.jar"));
             await pipeline(response.body, file);
             const java = await javaManager.ensureJava(await versionManager.getJavaVersion(version));
-            spawn(
-                java, [
-                    "-jar",
-                    path.join(dir, "installer.jar"),
-                    "--installServer"
-                ]
-            )
+            const serverJarDir = path.join(basePaths.downloads, software, String(version));
+            await mkdir(serverJarDir, {recursive: true});
+            await new Promise((resolve, reject) => {
+                const installerProcess = spawn(
+                    java, [
+                        "-jar",
+                        path.join(dir, "installer.jar"),
+                        "--installServer"
+                    ],
+                    {cwd: serverJarDir}
+                )
 
-            await rmdir(dir, {recursive: true});
+                installerProcess.stdout.on("data", (data) => {
+                    console.log(data.toString());
+                });
+                installerProcess.stderr.on("data", (data) => {
+                    console.error(data.toString());
+                });
+
+                installerProcess.on("close", async () => {
+                    console.log("Installer process closed");
+                    resolve();
+                    await rm(dir, {recursive: true});
+                })
+
+            })
         }
     }
 
@@ -81,6 +103,15 @@ export class ServerManager {
         const javaPath = await javaManager.ensureJava(await versionManager.getJavaVersion(config.version));
         const serverFolder = path.join(basePaths.servers, id);
         const jar = await this.#ensureServer(config.software,config.version);
+        if (config.software === "forge") {
+            const libraries = path.join(basePaths.downloads, config.software, config.version,"libraries");
+            const lib = path.join(basePaths.servers,id,"libraries");
+            await mkdir(lib, {recursive: true});
+            const readLib = await readdir(lib);
+            if (readLib.length === 0) {
+                await cp(libraries,lib,{recursive: true});
+            }
+        }
         if (!jar) {
             throw new Error("Server.jar not found!");
         }
@@ -89,6 +120,7 @@ export class ServerManager {
             javaPath, [
                 `-Xms${config.minRam}`,
                 `-Xmx${config.maxRam}`,
+                "-Djava.net.preferIPv6Addresses=system",
                 ...config.jvmArguments,
                 "-jar",
                 jar,
@@ -156,6 +188,8 @@ export class ServerManager {
         await this.#createEleserver(id, name, software, version, "2G", "4G");
 
         const serverProcess = await this.#startServerInternal(id);
+
+
         if (!acceptEula) {return}
 
         serverProcess.on("exit", async () => {
@@ -255,4 +289,4 @@ export class ServerManager {
 }
 
 const server = new ServerManager();
-await server.createServer("fabric","26.2");
+await server.startServer("7f43b0789ea00630");
