@@ -1,5 +1,4 @@
-import {contextBridge,ipcRenderer} from "electron";
-
+const {contextBridge,ipcRenderer} = require("electron");
 
 
 contextBridge.exposeInMainWorld("server", {
@@ -44,6 +43,9 @@ contextBridge.exposeInMainWorld("version", {
     },
     getPurpurVersions: () => {
         return ipcRenderer.invoke("version:getPurpur");
+    },
+    getForgeVersions: () => {
+        return ipcRenderer.invoke("version:getForge");
     }
 });
 

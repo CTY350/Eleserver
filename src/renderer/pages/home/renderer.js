@@ -1,15 +1,22 @@
-const createButton = document.querySelector('.create-button');
-const overlay = document.querySelector('.overlay');
-
-const backButton = document.querySelector('.back-button');
-
-createButton.addEventListener('click', e => {
-    overlay.classList.remove('hidden');
-});
+const serverList = document.querySelector(".server-list")
 
 
-backButton.addEventListener('click', e => {
-    overlay.classList.add('hidden');
-})
+async function loadServers() {
+    const servers = await window.server.getServers();
+    servers.forEach(server => {
+        const card = document.createElement("div");
+        card.classList.add("server-card");
 
+        const title = document.createElement("h2");
+        title.textContent = server.name;
+        card.appendChild(title);
 
+        const version = document.createElement("p");
+        version.textContent = `${server.software} · ${server.version}`;
+
+        card.append(title,version);
+        serverList.appendChild(card);
+    })
+}
+
+loadServers();

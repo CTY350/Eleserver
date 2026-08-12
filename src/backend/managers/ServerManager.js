@@ -287,6 +287,3 @@ export class ServerManager {
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(serverInfo, null, 4));
     }
 }
-
-const server = new ServerManager();
-await server.startServer("7f43b0789ea00630");

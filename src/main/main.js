@@ -21,11 +21,11 @@ function startApp() {
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
-            devTools: false,
+            devTools: true,
             preload: path.join(__dirname, 'preload.js'),
         }
     });
-    Menu.setApplicationMenu(null);
+    // Menu.setApplicationMenu(null);
     win.loadFile("src/renderer/pages/home/index.html");
 }
 
@@ -96,6 +96,10 @@ ipcMain.handle("version:getPaper", (_) => {
 ipcMain.handle("version:getPurpur",(_) => {
     return versionManager.getPurpurVersions();
 });
+
+ipcMain.handle("version:getForge", (_) => {
+    return versionManager.getForgeVersions();
+})
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
