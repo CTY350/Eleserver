@@ -28,6 +28,12 @@ contextBridge.exposeInMainWorld("server", {
     },
     saveServerInfo: (id,newKey,newValue) => {
         return ipcRenderer.invoke("server:saveServerInfo",id,newKey,newValue);
+    },
+    setServerLogo: (id,pngPath) => {
+        return ipcRenderer.invoke("server:setLogo",id,pngPath);
+    },
+    getServerLogo: (id) => {
+        return ipcRenderer.invoke("server:getLogo",id);
     }
 });
 

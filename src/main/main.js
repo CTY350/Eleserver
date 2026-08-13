@@ -79,6 +79,14 @@ ipcMain.handle("server:saveServerInfo",(_,id,newKey,newValue) => {
     return serverManager.saveServerInfo(id,newKey,newValue);
 });
 
+ipcMain.handle("server:setLogo",(_,id,pngPath) => {
+    return serverManager.setServerLogo(id,pngPath);
+});
+
+ipcMain.handle("server:getLogo",(_,id) => {
+    return serverManager.getServerLogo(id);
+});
+
 // ━━━━━━━━━━━━━━━━━━━━━━
 
 ipcMain.handle("version:getVanilla" ,(_) => {

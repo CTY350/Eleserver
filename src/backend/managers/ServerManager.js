@@ -9,6 +9,7 @@ import path from 'path';
 import {spawn} from 'child_process';
 import os from 'node:os';
 import * as constants from "node:constants";
+import sharp from 'sharp'
 
 const versionManager = new VersionManager();
 const javaManager = new JavaManager();
@@ -285,5 +286,18 @@ export class ServerManager {
         const serverInfo = await this.#getServerInfo(id);
         serverInfo[newKey] = newValue;
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(serverInfo, null, 4));
+    }
+
+    async setServerLogo(id, PngPath) {
+        const serverPath = path.join(basePaths.servers, id);
+        const logoPath = path.join(serverPath, "server-icon.png");
+
+        await sharp(pngPath).resize(64,64, {fit: "cover"}).png().toFile(logoPath);
+    }
+    async getServerLogo(id) {
+        const logoPath = path.join(basePaths.servers, id, "server-icon.png");
+        const logo = await readFile(logoPath);
+
+        return `data:image/png;base64,${logo.toString("base64")}`;
     }
 }
