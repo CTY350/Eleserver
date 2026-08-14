@@ -58,7 +58,7 @@ main {
 
 
 .create-button {
-    background: #2a54da;
+    background: #06aaf3;
     border: none;
     padding: 0;
     margin: 0;
@@ -70,21 +70,26 @@ main {
     height: 33px;
     color: #ffffff;
     font-size: 14px;
-    font-weight: 400;
-    font-family: Play;
+    font-family: Play, sans-serif;
     font-weight: 700;
-    font-size: 14px;
     letter-spacing: 0.3px;
     cursor: pointer;
     user-select: none;
+    transition: background 0.2s;
 }
+.create-button:hover {
+    background-color: #0071e2;
+}
+
 
 .server-list {
     height: 100%;
     background: transparent;
     width: 100%;
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     flex: 1;
     gap: 16px;
     margin: 0 auto;
@@ -104,6 +109,11 @@ main {
     border-radius: 6px;
     box-sizing: border-box;
     padding-left: 16px;
+    transition: background 0.3s;
+}
+
+.server-card:hover {
+    background: #191919;
 }
 .server-icon {
     width: 80px;
@@ -130,20 +140,61 @@ main {
     font-weight: 700;
     letter-spacing: 0.3px;
     justify-content: center;
-    align-items: center;
+    align-items: flex-start;
     background: transparent;
     overflow: hidden;
     height: 80px;
     margin: 0;
     padding: 0;
     color: #f0f0f0;
+    text-align: left;
 
-    h1 {
-        margin: 0;
-        padding: 0;
-    }
-    p {
-        margin-top: 16px;
-        padding: 0;
-    }
+
+}
+.server-info h1 {
+    margin: 0;
+    padding: 0;
+    font-size: 26px;
+}
+
+.server-version {
+    margin: 0;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    display: flex;
+    flex-direction: row;
+    gap: 4px;
+}
+.server-version p {
+    margin: 0;
+    padding: 0;
+}
+
+.server-id {
+    font-family: Play, sans-serif;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    font-size: 10px;
+    box-sizing: border-box;
+    color: #605e5e;
+    padding:0;
+    margin-top: 5px;
+}
+
+.version-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
+}
+.placeholder {
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #706d6d;
 }

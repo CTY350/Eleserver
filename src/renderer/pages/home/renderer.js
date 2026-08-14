@@ -3,6 +3,13 @@ const serverList = document.querySelector(".server-list")
 
 async function loadServers() {
     const servers = await window.server.getServers();
+    if (servers.length === 0) {
+        const placeholder = document.createElement("p");
+
+        placeholder.textContent = "You don't have any servers yet";
+        placeholder.classList.add("placeholder");
+        serverList.appendChild(placeholder);
+    }
     for (const server of servers) {
         const card = document.createElement("div");
         const serverInfo = document.createElement("div");
@@ -15,9 +22,18 @@ async function loadServers() {
 
         const id = document.createElement("p");
         id.textContent = `#${server.id}`;
+        id.classList.add("server-id")
 
-        const version = document.createElement("p");
-        version.textContent = `${server.software} · ${server.version}`;
+        const version = document.createElement("div");
+        const versionImage = document.createElement("img");
+        const text = document.createElement("p");
+        text.textContent = `${server.software} · ${server.version}`;
+        versionImage.src = `../../assets/software-icons/${server.software}.png`
+        versionImage.classList.add("version-icon");
+        version.append(versionImage,text);
+
+        version.classList.add("server-version");
+
         const image = document.createElement("img");
         let logo;
         try {
@@ -39,5 +55,10 @@ async function loadServers() {
         serverList.appendChild(card);
     }
 }
+
+
+
+
+
 
 loadServers();
