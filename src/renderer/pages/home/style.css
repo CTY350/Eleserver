@@ -109,7 +109,6 @@ main {
     border-radius: 6px;
     box-sizing: border-box;
     padding-left: 16px;
-    transition: background 0.3s;
 }
 
 .server-card:hover {
@@ -197,4 +196,105 @@ main {
     font-weight: 700;
     font-size: 14px;
     color: #706d6d;
+}
+.overlay {
+    z-index: 10;
+    position: fixed;
+    inset: 0;
+    background: transparent;
+    backdrop-filter: blur(10px);
+    display: none;
+    justify-content: center;
+    align-items: center;
+}
+.form {
+    width: 400px;
+    height: 450px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    background: #191919;
+    padding-top: 32px;
+    border-radius: 16px;
+}
+.form form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+
+    width: 350px;
+    height: 350px;
+    margin: 0;
+    gap: 20px;
+    color: white;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+}
+.form label {
+    font-size: 16px;
+    user-select: none;
+}
+.form input,.form select {
+    width: 90%;
+    height: 50px;
+    margin: 0 auto;
+    border-radius: 6px;
+    background: #131313;
+    border: none;
+    color: white;
+    outline: none;
+    box-sizing: border-box;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding-left: 16px;
+}
+.form input {
+    text-align: center;
+}
+.form button {
+    background: #06aaf3;
+    border: none;
+    outline: none;
+    color: white;
+    cursor: pointer;
+    width: 110px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    margin: 0;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    border-radius: 6px;
+    transition: 0.3s;
+    user-select: none;
+}
+.form input::placeholder {
+    user-select: none;
+}
+.form button:hover {
+    background: #0071e2;
+}
+.form button:active {
+    transform: scale(0.97);
+}
+
+.create-text {
+    display: inline;
+    text-align: center;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    width: 80%;
+    margin: 0 auto;
+    height: 20px;
+    padding: 0;
+}
+#loader {
+    display: none;
 }

@@ -32,19 +32,31 @@
         </button>
     </div>
     <div class="server-list"></div>
-    
-    <div>
-        <form>
+</main>
+<div class="overlay">
+    <div class="form">
+        <form id="server-form">
             <label for="server-name">Server Name</label>
-            <input type="text" id="server-name" name="server-name"/>
+            <input type="text" id="server-name" placeholder="Server Name" name="server-name" minlength="3" maxlength="16" required/>
 
             <label for="server-software">Software</label>
-            <select id="server-software"></select>
+            <select id="server-software">
+                <option value="vanilla">Vanilla</option>
+                <option value="fabric">Fabric</option>
+                <option value="paper">Paper</option>
+                <option value="purpur">Purpur</option>
+                <option value="forge">Forge</option>
+            </select>
 
             <label for="server-version">Version</label>
             <select id="server-version"></select>
+
         </form>
+        <button type="submit" form="server-form" id="create-button">
+            <span class="create-text" id="normal-text">Create</span>
+            <span id="loader" class="create-text"></span>
+        </button>
     </div>
-</main>
+</div>
 </body>
 </html>

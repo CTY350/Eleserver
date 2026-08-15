@@ -58,6 +58,59 @@ async function loadServers() {
 
 
 
+const overlay = document.querySelector(".overlay");
+const createButton = document.querySelector(".create-button");
+
+overlay.addEventListener("click", (event) => {
+    if (event.target === overlay) {
+        overlay.style.display = "none";
+    }
+});
+createButton.addEventListener("click", () => {
+    overlay.style.display = "flex";
+})
+
+
+
+const nameInput = document.querySelector("#server-name");
+const softwareSelect = document.querySelector("#server-software");
+const versionSelect = document.querySelector("#server-version");
+const form = document.querySelector("#server-form");
+
+nameInput.addEventListener("input", (e) => {
+    if (nameInput.value === "") {
+        nameInput.setCustomValidity("required");
+    }
+    else if (nameInput.value.length < 3) {
+        nameInput.setCustomValidity("Server name must be at least 3 characters");
+    } else {
+        nameInput.setCustomValidity("");
+    }
+})
+
+
+
+form.addEventListener("submit", (event) => {
+    event.preventDefault();
+
+    const loader = document.querySelector("#loader");
+    const normalText = document.querySelector("#normal-text");
+    const createButton = document.querySelector("#create-button");
+    normalText.style.display = "none";
+    loader.style.display = "block";
+    createButton.disabled = true;
+    let dots = 0;
+
+    const interval = setInterval(() => {
+        if (dots === 3) {
+            dots = 0;
+        }
+        dots++;
+
+
+        loader.textContent = "Creating " + ".".repeat(dots);
+    },400);
+})
 
 
 
