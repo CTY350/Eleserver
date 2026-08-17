@@ -19,8 +19,29 @@ html,
 body {
     background: #121212;
     margin: 0;
-
+    overflow: auto;
 }
+
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: #121212;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 6px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+
+
+
 header {
     color: white;
     padding: 0;
@@ -94,6 +115,7 @@ main {
     gap: 16px;
     margin: 0 auto;
     user-select: none;
+    overflow-y: auto ;
 }
 .server-card {
     display: flex;

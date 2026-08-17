@@ -134,7 +134,7 @@ export class VersionManager {
             const mcVersion = version.split("-");
             versions.add(mcVersion[0]);
         }
-        return [...versions].sort((a,b) => {
+        const versionList =  [...versions].sort((a,b) => {
             const mcVersionA = a.split(".");
             const mcVersionB = b.split(".");
 
@@ -164,6 +164,14 @@ export class VersionManager {
             }
             return mcVersionBInt[2] - mcVersionAInt[2];
         });
+
+        const result = [];
+        for (const version of versionList) {
+            result.push({
+                version: version
+            });
+        }
+        return result;
     }
 
 

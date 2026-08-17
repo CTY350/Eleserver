@@ -2,6 +2,7 @@ const serverList = document.querySelector(".server-list")
 
 
 async function loadServers() {
+    serverList.replaceChildren();
     const servers = await window.server.getServers();
     if (servers.length === 0) {
         const placeholder = document.createElement("p");
@@ -77,20 +78,50 @@ const softwareSelect = document.querySelector("#server-software");
 const versionSelect = document.querySelector("#server-version");
 const form = document.querySelector("#server-form");
 
-nameInput.addEventListener("input", (e) => {
-    if (nameInput.value === "") {
-        nameInput.setCustomValidity("required");
+
+
+
+async function updateVersions() {
+    const software = softwareSelect.value;
+    let versions;
+    switch (software) {
+        case "vanilla": {
+            versions = await window.version.getVanillaVersions();
+            break;
+        }
+        case "fabric": {
+            versions = await window.version.getFabricVersions();
+            break;
+        }
+        case "paper": {
+            versions = await window.version.getPurpurVersions();
+            break;
+        }
+        case "purpur": {
+            versions = await window.version.getPurpurVersions();
+            break;
+        }
+        case "forge": {
+            versions = await window.version.getForgeVersions();
+            break;
+        }
     }
-    else if (nameInput.value.length < 3) {
-        nameInput.setCustomValidity("Server name must be at least 3 characters");
-    } else {
-        nameInput.setCustomValidity("");
+    versionSelect.replaceChildren();
+    for (const version of versions) {
+        const option = document.createElement("option");
+        option.textContent = version.version;
+        option.value = version.version;
+        versionSelect.appendChild(option);
     }
+}
+
+softwareSelect.addEventListener("change", async () => {
+    updateVersions();
+
 })
 
 
-
-form.addEventListener("submit", (event) => {
+form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const loader = document.querySelector("#loader");
@@ -110,8 +141,32 @@ form.addEventListener("submit", (event) => {
 
         loader.textContent = "Creating " + ".".repeat(dots);
     },400);
-})
+
+    const data = new FormData(event.target);
+
+    nameInput.disabled = true;
+    softwareSelect.disabled = true;
+    versionSelect.disabled = true;
 
 
+    await window.server.createServer(data.get("serverName").trim(),data.get("serverSoftware"),data.get("serverVersion"),{acceptEula: true});
 
+    loadServers();
+    overlay.style.display = "none";
+
+    nameInput.disabled = false;
+    softwareSelect.disabled = false;
+    versionSelect.disabled = false;
+
+    createButton.disabled = false;
+
+    clearInterval(interval);
+
+    normalText.style.display = "inline";
+    loader.style.display = "none";
+    form.reset();
+});
+
+
+updateVersions();
 loadServers();

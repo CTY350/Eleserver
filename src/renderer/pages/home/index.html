@@ -37,10 +37,10 @@
     <div class="form">
         <form id="server-form">
             <label for="server-name">Server Name</label>
-            <input type="text" id="server-name" placeholder="Server Name" name="server-name" minlength="3" maxlength="16" required/>
+            <input type="text" id="server-name" placeholder="Server Name" name="serverName" minlength="3" maxlength="16" required/>
 
             <label for="server-software">Software</label>
-            <select id="server-software">
+            <select id="server-software" name="serverSoftware">
                 <option value="vanilla">Vanilla</option>
                 <option value="fabric">Fabric</option>
                 <option value="paper">Paper</option>
@@ -49,7 +49,7 @@
             </select>
 
             <label for="server-version">Version</label>
-            <select id="server-version"></select>
+            <select id="server-version" name="serverVersion"></select>
 
         </form>
         <button type="submit" form="server-form" id="create-button">

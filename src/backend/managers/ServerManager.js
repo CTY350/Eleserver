@@ -132,7 +132,7 @@ export class ServerManager {
         return serverProcess;
     }
 
-    async #createEleserver(id, name, software, version, minRam, maxRam) {
+    async #createEleserver(id, name, software, version, minRam, maxRam,timestamp) {
         const content = {
             "id": id,
             "name": name,
@@ -140,7 +140,7 @@ export class ServerManager {
             "version": version,
             "minRam": minRam,
             "maxRam": maxRam,
-
+            "createdAt": timestamp,
             "jvmArguments": []
         }
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(content, null, 4));
@@ -186,7 +186,7 @@ export class ServerManager {
     async createServer(name, software, version, {acceptEula = false} = {}) {
         const id = randomBytes(8).toString("hex");
         await mkdir(path.join(basePaths.servers, id));
-        await this.#createEleserver(id, name, software, version, "2G", "4G");
+        await this.#createEleserver(id, name, software, version, "2G", "4G",Date.now());
 
         const serverProcess = await this.#startServerInternal(id);
 
@@ -261,9 +261,10 @@ export class ServerManager {
                 "name": serverConfig.name,
                 "software": serverConfig.software,
                 "version": serverConfig.version,
+                "createdAt": serverConfig.createdAt
             });
         }
-        return serverContent;
+        return serverContent.sort((a,b) => b.createdAt - a.createdAt);
     }
 
 
