@@ -15,7 +15,6 @@
     "electron": "^43.1.1"
   },
   "dependencies": {
-    "@achingbrain/nat-port-mapper": "^4.0.5",
     "extract-zip": "^2.0.1",
     "fast-xml-parser": "^5.10.1",
     "nat-upnp": "^1.1.1",

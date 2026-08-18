@@ -51,6 +51,12 @@ async function loadServers() {
         serverInfo.append(title,id,version);
         serverIcon.append(image);
 
+
+        card.addEventListener("click", () => {
+            sessionStorage.setItem("serverId", server.id);
+            window.location.href = "../server/index.html";
+        })
+
         card.appendChild(serverIcon);
         card.appendChild(serverInfo);
         serverList.appendChild(card);

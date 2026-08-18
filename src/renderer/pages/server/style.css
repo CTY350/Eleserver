@@ -1,0 +1,64 @@
+@font-face {
+    font-family: 'Play';
+    src: url("../../assets/fonts/Play-Regular.ttf") format("truetype");
+    font-weight: 400;
+}
+@font-face {
+    font-family: 'Play';
+    src: url("../../assets/fonts/Play-Bold.ttf") format("truetype");
+    font-weight: 700;
+}
+
+html,
+body {
+    background:#121212;
+    margin: 0;
+    padding: 0;
+}
+.server-header {
+    width: 95%;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    flex-direction: column;
+    height: 400px;
+    background: transparent;
+    font-family: Play, sans-serif;
+    font-weight: 700;
+    padding: 16px;
+    padding-top: 50px;
+}
+
+#server-info {
+    width: 95%;
+    height: 50%;
+    background: #161C21;
+    border-radius: 6px;
+}
+
+#server-status {
+    width: 95%;
+    height: 13%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    background: red;
+    border-radius: 6px;
+    margin-bottom: 80px;
+}
+#start-stop-button {
+    width: 120px;
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    background: red;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    border-radius: 6px;
+}
