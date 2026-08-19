@@ -1,4 +1,4 @@
-import {writeFile,mkdir,readFile,readdir,rm,access,cp} from "node:fs/promises";
+import {writeFile,mkdir,readFile,readdir,rm,cp} from "node:fs/promises";
 import {randomBytes} from "node:crypto";
 import {VersionManager} from "./versionManager.js";
 import {JavaManager} from './JavaManager.js';
@@ -8,11 +8,13 @@ import {basePaths} from '../paths.js'
 import path from 'path';
 import {spawn} from 'child_process';
 import os from 'node:os';
-import * as constants from "node:constants";
-import sharp from 'sharp'
+import sharp from 'sharp';
+import EventEmitter from "node:events";
 
 const versionManager = new VersionManager();
 const javaManager = new JavaManager();
+
+const serverEvents = new EventEmitter();
 
 export class ServerManager {
 
@@ -207,15 +209,21 @@ export class ServerManager {
 
         this.processes.set(id, serverProcess);
 
+        serverProcess.on("spawn", () => {
+            serverEvents.emit("server-started", id);
+        });
         serverProcess.on("exit", () => {
             this.processes.delete(id);
-        })
+            serverEvents.emit("server-closed",id);
+        });
         serverProcess.on("error", (error) => {
             this.processes.delete(id);
-        })
+            serverEvents.emit("server-error", id,error);
+        });
         serverProcess.stdout.on("data", data => {
             console.log(data.toString());
-        })
+            serverEvents.emit("server-log", id,data.toString());
+        });
     }
 
     stopServer(id,{force = false} = {}) {
@@ -302,3 +310,5 @@ export class ServerManager {
         return `data:image/png;base64,${logo.toString("base64")}`;
     }
 }
+
+export {serverEvents}

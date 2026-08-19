@@ -28,26 +28,45 @@ body {
     font-weight: 700;
     padding: 16px;
     padding-top: 50px;
+    gap: 80px;
+}
+
+#server-main {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 340px;
 }
 
 #server-info {
     width: 95%;
-    height: 50%;
+    height: 60%;
     background: #161C21;
     border-radius: 6px;
 }
 
 #server-status {
     width: 95%;
-    height: 13%;
+    height: 15%;
     display: flex;
     text-align: center;
     justify-content: center;
     align-items: center;
     flex-direction: row;
-    background: red;
     border-radius: 6px;
-    margin-bottom: 80px;
+}
+
+
+#server-status.online {
+    background: green;
+}
+#server-status.offline {
+    background: red;
+}
+#server-status.loading {
+    background: #686868;
 }
 #start-stop-button {
     width: 120px;
@@ -61,4 +80,9 @@ body {
     outline: none;
     cursor: pointer;
     border-radius: 6px;
+}
+
+#server-name {
+    display: flex;
+
 }

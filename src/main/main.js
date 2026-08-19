@@ -5,15 +5,20 @@ import {ServerManager} from "../backend/managers/ServerManager.js";
 import {VersionManager} from "../backend/managers/VersionManager.js";
 import {NetworkManager} from "../backend/managers/NetworkManager.js";
 
+import {serverEvents} from "../backend/managers/ServerManager.js";
+
 import path from "node:path";
 import {fileURLToPath} from "node:url";
+
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+let win;
+
 function startApp() {
     initialize();
-    const win = new BrowserWindow({
+    win = new BrowserWindow({
         width: 1200,
         height: 800,
         minHeight: 700,
@@ -27,6 +32,7 @@ function startApp() {
     });
     // Menu.setApplicationMenu(null);
     win.loadFile("src/renderer/pages/home/index.html");
+
 }
 
 const serverManager = new ServerManager();
@@ -40,6 +46,23 @@ app.whenReady().then(() => startApp());
 app.on("will-quit", () => {
     networkManager.close();
 });
+
+serverEvents.on("server-started", (id) => {
+    win.webContents.send("server-started",id);
+});
+
+serverEvents.on("server-closed", (id) => {
+    win.webContents.send("server-closed",id);
+});
+
+serverEvents.on("server-error", (id,error) => {
+    win.webContents.send("server-error",id,error);
+});
+
+serverEvents.on("server-log", (id,data) => {
+    win.webContents.send("server-log",id,data);
+});
+
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 

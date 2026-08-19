@@ -34,6 +34,29 @@ contextBridge.exposeInMainWorld("server", {
     },
     getServerLogo: (id) => {
         return ipcRenderer.invoke("server:getLogo",id);
+    },
+    on: (event,callback) => {
+        switch (event) {
+            case "start": {
+                ipcRenderer.on("server-started", (_,id) => {callback(id)});
+                break;
+            }
+            case "close": {
+                ipcRenderer.on("server-closed", (_,id) => {callback(id)});
+                break;
+            }
+            case "error": {
+                ipcRenderer.on("server-error", (_,id,error) => {callback(id,error)});
+                break;
+            }
+            case "data": {
+                ipcRenderer.on("server-log", (_,id,data) => {callback(id,data)});
+                break;
+            }
+            default: {
+                throw new Error(`Unknown event: ${event}`);
+            }
+        }
     }
 });
 
