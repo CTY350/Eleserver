@@ -1,0 +1,29 @@
+<svg
+        width="64"
+        height="64"
+        viewBox="0 0 64 64"
+        xmlns="http://www.w3.org/2000/svg"
+>
+    <mask id="play-cutout">
+        <rect width="64" height="64" fill="white"/>
+
+        <path
+                d="M27 20
+               C25 18.8 22 20.2 22 23
+               V41
+               C22 43.8 25 45.2 27 44
+               L43 34
+               C45 32.8 45 31.2 43 30
+               Z"
+                fill="black"
+        />
+    </mask>
+
+    <circle
+            cx="32"
+            cy="32"
+            r="28"
+            fill="white"
+            mask="url(#play-cutout)"
+    />
+</svg>

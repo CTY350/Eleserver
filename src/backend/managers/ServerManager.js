@@ -131,7 +131,9 @@ export class ServerManager {
             ],
             {cwd: serverFolder}
         )
+
         return serverProcess;
+
     }
 
     async #createEleserver(id, name, software, version, minRam, maxRam,timestamp) {
@@ -192,38 +194,57 @@ export class ServerManager {
 
         const serverProcess = await this.#startServerInternal(id);
 
+        await new Promise((resolve, reject) => {
+            serverProcess.on("exit", async() => {
+                try {
+                    const eulaPath = path.join(basePaths.servers, id, "eula.txt");
+                    await writeFile(eulaPath, "eula=true");
 
-        if (!acceptEula) {return}
+                    await this.startServer(id);
+                    await this.stopServer(id);
+                    if (!acceptEula) {
+                        // await writeFile(eulaPath, "eula=false");
+                    };
+                    resolve();
+                } catch (e) {
+                    reject(e);
+                }
 
-        serverProcess.on("exit", async () => {
-            const eulaPath = path.join(basePaths.servers, id, "eula.txt");
-            await writeFile(eulaPath, "eula=true");
+            });
         });
+
     }
 
     async startServer(id) {
         if (this.processes.has(id)) {
             throw new Error("Server is already running");
         }
-        const serverProcess = await this.#startServerInternal(id);
 
-        this.processes.set(id, serverProcess);
+        return new Promise(async (resolve, reject) => {
+            const serverProcess = await this.#startServerInternal(id);
 
-        serverProcess.on("spawn", () => {
-            serverEvents.emit("server-started", id);
-        });
-        serverProcess.on("exit", () => {
-            this.processes.delete(id);
-            serverEvents.emit("server-closed",id);
-        });
-        serverProcess.on("error", (error) => {
-            this.processes.delete(id);
-            serverEvents.emit("server-error", id,error);
-        });
-        serverProcess.stdout.on("data", data => {
-            console.log(data.toString());
-            serverEvents.emit("server-log", id,data.toString());
-        });
+            this.processes.set(id, serverProcess);
+
+            serverProcess.on("exit", () => {
+                this.processes.delete(id);
+                serverEvents.emit("server-closed",id);
+            });
+            serverProcess.on("error", (error) => {
+                this.processes.delete(id);
+                serverEvents.emit("server-error", id,error);
+                reject(error);
+            });
+            serverProcess.stdout.on("data", data => {
+                console.log(data.toString());
+                serverEvents.emit("server-log", id,data.toString());
+
+                if (data.toString().includes("Done") && data.toString().includes("For help, type \"help\"")) {
+                    serverEvents.emit("server-started", id);
+                    resolve();
+                }
+            });
+        })
+
     }
 
     stopServer(id,{force = false} = {}) {

@@ -27,8 +27,8 @@ body {
     font-family: Play, sans-serif;
     font-weight: 700;
     padding: 16px;
-    padding-top: 50px;
-    gap: 80px;
+    padding-top: 32px;
+    gap: 20px;
 }
 
 #server-main {
@@ -45,6 +45,11 @@ body {
     height: 60%;
     background: #161C21;
     border-radius: 6px;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
 }
 
 #server-status {
@@ -56,11 +61,22 @@ body {
     align-items: center;
     flex-direction: row;
     border-radius: 6px;
+    color: white;
+    font-family: Play, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    gap: 5px;
+    user-select: none;
+}
+#server-status-icon {
+    width: 27px;
+    height: 27px;
 }
 
 
 #server-status.online {
     background: green;
+    box-shadow: 0 0 10px green;
 }
 #server-status.offline {
     background: red;
@@ -68,21 +84,45 @@ body {
 #server-status.loading {
     background: #686868;
 }
-#start-stop-button {
+#start-button {
     width: 120px;
     height: 60px;
     display: flex;
     justify-content: center;
     align-items: center;
     flex-direction: row;
-    background: red;
     border: none;
     outline: none;
     cursor: pointer;
     border-radius: 6px;
+    gap: 10px;
+    color: white;
+    font-family: Play, sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    user-select: none;
+    transition: box-shadow 0.3s, transform 0.3s;
 }
 
-#server-name {
-    display: flex;
+#start-button:active {
+    transform: scale(0.97);
+}
+#button-icon {
+    width: 30px;
+    height: 30px;
+}
+#button-text {
+}
+#start-button.start {
+    background: green;
+}
+#start-button.start:hover {
+    box-shadow: 0 0 10px green;
+}
 
+#start-button.stop {
+    background: red;
+}
+#start-button.stop:hover {
+    box-shadow: 0 0 10px red;
 }

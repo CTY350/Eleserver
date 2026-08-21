@@ -8,20 +8,28 @@
     <script src="renderer.js" defer></script>
 </head>
 <body>
-<header class="server-header">
-    <div id="server-main">
-        <div id="server-info">
-            <h1 id="server-name"></h1>
-            <p id="server-version"></p>
+<div id="home-page">
+    <header class="server-header">
+        <div id="server-main">
+            <div id="server-info">
+                <h1 id="server-name"></h1>
+                <p id="server-version"></p>
+            </div>
+            <div id="server-status">
+                <img src="" alt="" id="server-status-icon">
+                <p id="server-status-text"></p>
+            </div>
         </div>
-        <div id="server-status" ></div>
-    </div>
-    <button id="start-stop-button"></button>
-</header>
-<main class="server-content">
-    <div id="server-ip"></div>
-    <div id="min-ram"></div>
-    <div id="max-ram"></div>
-</main>
+        <button id="start-button">
+            <img src="" alt="" id="button-icon">
+            <p id="button-text"></p>
+        </button>
+    </header>
+    <main class="server-content">
+        <div id="server-ip"></div>
+        <div id="min-ram"></div>
+        <div id="max-ram"></div>
+    </main>
+</div>
 </body>
 </html>

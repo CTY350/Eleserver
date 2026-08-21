@@ -36,9 +36,10 @@ contextBridge.exposeInMainWorld("server", {
         return ipcRenderer.invoke("server:getLogo",id);
     },
     on: (event,callback) => {
+        console.log("handling", event);
         switch (event) {
             case "start": {
-                ipcRenderer.on("server-started", (_,id) => {callback(id)});
+                ipcRenderer.on("server-started", (_,id) => {callback(id);});
                 break;
             }
             case "close": {

@@ -32,7 +32,6 @@ function startApp() {
     });
     // Menu.setApplicationMenu(null);
     win.loadFile("src/renderer/pages/home/index.html");
-
 }
 
 const serverManager = new ServerManager();
