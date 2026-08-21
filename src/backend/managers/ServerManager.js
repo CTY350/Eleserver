@@ -18,7 +18,7 @@ const serverEvents = new EventEmitter();
 
 export class ServerManager {
 
-    processes = new Map();
+    #processes = new Map();
 
     // ━━━━━━━━━━━━━━━━━━━━━━
     // Private Methods
@@ -216,21 +216,21 @@ export class ServerManager {
     }
 
     async startServer(id) {
-        if (this.processes.has(id)) {
+        if (this.#processes.has(id)) {
             throw new Error("Server is already running");
         }
 
         return new Promise(async (resolve, reject) => {
             const serverProcess = await this.#startServerInternal(id);
 
-            this.processes.set(id, serverProcess);
+            this.#processes.set(id, serverProcess);
 
             serverProcess.on("exit", () => {
-                this.processes.delete(id);
+                this.#processes.delete(id);
                 serverEvents.emit("server-closed",id);
             });
             serverProcess.on("error", (error) => {
-                this.processes.delete(id);
+                this.#processes.delete(id);
                 serverEvents.emit("server-error", id,error);
                 reject(error);
             });
@@ -248,11 +248,11 @@ export class ServerManager {
     }
 
     stopServer(id,{force = false} = {}) {
-        if (!this.processes.has(id)) {
+        if (!this.#processes.has(id)) {
             throw new Error("Server is not running");
         }
 
-        const serverProcess = this.processes.get(id);
+        const serverProcess = this.#processes.get(id);
 
         if (force) {
             serverProcess.kill()
@@ -263,7 +263,7 @@ export class ServerManager {
     }
 
     async deleteServer(id) {
-        if (this.processes.has(id)) {
+        if (this.#processes.has(id)) {
             throw new Error("Server cannot be deleted while it's running");
         }
 
@@ -273,10 +273,10 @@ export class ServerManager {
     }
 
     sendCommand(id, command){
-        if (!this.processes.has(id)) {
+        if (!this.#processes.has(id)) {
             throw new Error("Server is not running");
         }
-        const serverProcess = this.processes.get(id);
+        const serverProcess = this.#processes.get(id);
         serverProcess.stdin.write(`${command}\n`);
     }
 
@@ -329,6 +329,9 @@ export class ServerManager {
         const logo = await readFile(logoPath);
 
         return `data:image/png;base64,${logo.toString("base64")}`;
+    }
+    serverRunning(id) {
+        return this.#processes.has(id);
     }
 }
 

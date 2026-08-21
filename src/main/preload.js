@@ -58,6 +58,9 @@ contextBridge.exposeInMainWorld("server", {
                 throw new Error(`Unknown event: ${event}`);
             }
         }
+    },
+    serverRunning: (id) => {
+        return ipcRenderer.invoke("server:serverRunning",id);
     }
 });
 

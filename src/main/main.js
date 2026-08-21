@@ -108,6 +108,9 @@ ipcMain.handle("server:setLogo",(_,id,pngPath) => {
 ipcMain.handle("server:getLogo",(_,id) => {
     return serverManager.getServerLogo(id);
 });
+ipcMain.handle("server:serverRunning",(_,id) => {
+    return serverManager.serverRunning(id);
+})
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 

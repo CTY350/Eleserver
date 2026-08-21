@@ -8,6 +8,11 @@
     src: url("../../assets/fonts/Play-Bold.ttf") format("truetype");
     font-weight: 700;
 }
+@font-face {
+    font-family: 'Roboto-mono';
+    src: url("../../assets/fonts/roboto-mono-cyrillic.woff2") format("woff2");
+    font-weight: 400;
+}
 
 html,
 body {
@@ -30,7 +35,9 @@ body {
     padding-top: 32px;
     gap: 20px;
 }
-
+#server-name {
+    margin: 0;
+}
 #server-main {
     display: flex;
     flex-direction: column;
@@ -53,6 +60,7 @@ body {
 }
 
 #server-status {
+    box-sizing: border-box;
     width: 95%;
     height: 15%;
     display: flex;
@@ -83,6 +91,14 @@ body {
 }
 #server-status.loading {
     background: #686868;
+    display: flex;
+    justify-content: flex-start;
+    align-items: center;
+    text-align: start;
+    font-family: Roboto-mono, monospace;
+    font-weight: 400;
+    font-size: 12px;
+    padding-left: 10px;
 }
 #start-button {
     width: 120px;
@@ -125,4 +141,31 @@ body {
 }
 #start-button.stop:hover {
     box-shadow: 0 0 10px red;
+}
+
+#connect-button {
+    box-sizing: border-box;
+    width: 80px;
+    height: 25px;
+    border: none;
+    border-radius: 4px;
+    font-family: Play, sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+    cursor: pointer;
+    transition: box-shadow 0.3s;
+}
+#connect-button:hover {
+    box-shadow: 0 0 5px white;
+}
+.overlay {
+    position: fixed;
+    height: 100%;
+    width: 100%;
+    z-index: 10;
+    backdrop-filter: blur(10px);
 }

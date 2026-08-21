@@ -11,7 +11,13 @@ const startButton  = document.querySelector("#start-button");
 const buttonIcon = document.querySelector("#button-icon");
 const buttonText = document.querySelector("#button-text");
 
+const connectButton = document.querySelector("#connect-button");
+
+let loading = false;
+
 function setStatus(status) {
+    statusIcon.style.display = "block";
+    statusText.innerText = "";
     if (status === "offline") {
         statusBar.classList.remove("online", "loading");
         statusBar.classList.add("offline");
@@ -31,8 +37,14 @@ function setStatus(status) {
 
         statusBar.classList.add("loading");
 
-        statusText.innerText = "Starting...";
-        statusIcon.src = "";
+        window.server.on("data", (serverId,data) => {
+            if (!loading) {return}
+            if (serverId !== id) {return}
+
+
+            statusText.innerText = data;
+        })
+        statusIcon.style.display = "none";
     }
 }
 function setButton(status) {
@@ -58,23 +70,44 @@ async function loadPage() {
     serverName.textContent = serverInfo.name;
     serverVersion.textContent = `${serverInfo.software} · ${serverInfo.version}`;
 
-    setStatus("offline");
-    setButton("start");
+    let serverRunning = await window.server.serverRunning(id);
+
+    if (serverRunning) {
+        setStatus("online");
+        setButton("stop");
+    } else {
+        setButton("start");
+        setStatus("offline");
+    }
+
 
 }
 
 startButton.addEventListener("click", async () => {
     startButton.disabled = true;
+    let serverRunning = await window.server.serverRunning(id);
+    console.log("server:",serverRunning);
+    loading = true;
     setStatus("loading");
+
     window.server.on("start", () => {
-        console.log("renderer:server started");
         setStatus("online");
         setButton("stop");
         startButton.disabled = false;
     });
+    window.server.on("close", async () => {
+        setStatus("offline");
+        setButton("start");
+        startButton.disabled = false;
+    });
 
-    await window.server.startServer(id);
+    if (serverRunning) {
+        await window.server.stopServer(id);
+    } else {
+        await window.server.startServer(id);
+    }
 
+    loading = false;
 
 })
 
