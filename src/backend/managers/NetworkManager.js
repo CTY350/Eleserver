@@ -59,17 +59,28 @@ export class NetworkManager {
         return await this.#getPublicIp();
     }
 
+    getLocalIp() {
+        const interfaces = os.networkInterfaces();
+
+        for (const address of Object.values(interfaces)) {
+            for (const info of address) {
+                if (info.internal) {continue}
+                if (info.family !== "IPv4") {continue}
+
+                return info.address;
+            }
+        }
+    }
+
     async openPort(port,{timeout = 0, ignoreCGNat = false} = {}) {
 
         if (!(await this.#hasUpnpGateway())) {
-            const upnperr = new Error("UPNP Gateway is not supported");
-            upnperr.code = "UPNP_NOT_AVAILABLE";
+            const upnperr = new Error("UPNP_NOT_AVAILABLE");
             throw upnperr;
         }
 
         if (await this.#isBehindCGNAT()  && !ignoreCGNat) {
-            const cgnaterr = new Error("CGNAT Detected");
-            cgnaterr.code = "CGNAT_DETECTED";
+            const cgnaterr = new Error("CGNAT_DETECTED");
             throw cgnaterr;
         }
 

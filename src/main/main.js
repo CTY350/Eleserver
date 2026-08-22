@@ -1,4 +1,4 @@
-import {BrowserWindow,app,ipcMain,Menu} from "electron";
+import {BrowserWindow,app,ipcMain,Menu,dialog} from "electron";
 import {initialize} from "../backend/initialize/initialize.js";
 
 import {ServerManager} from "../backend/managers/ServerManager.js";
@@ -62,6 +62,18 @@ serverEvents.on("server-log", (id,data) => {
     win.webContents.send("server-log",id,data);
 });
 
+
+// ━━━━━━━━━━━━━━━━━━━━━━
+
+ipcMain.handle("electron:showMessage", async (_, type,title,message, buttons) => {
+    const result = await dialog.showMessageBox({
+        type: type,
+        title: title,
+        message: message,
+        buttons: buttons,
+    });
+    return result.response;
+});
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
@@ -150,4 +162,8 @@ ipcMain.handle("network:closePort",(_,port) => {
 
 ipcMain.handle("network:getPortMappings", (_) => {
     return networkManager.getPortMappings();
+});
+
+ipcMain.handle("network:getLocalIp",(_) => {
+    return networkManager.getLocalIp();
 });

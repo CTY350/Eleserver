@@ -1,6 +1,14 @@
 const {contextBridge,ipcRenderer} = require("electron");
 
 
+
+
+contextBridge.exposeInMainWorld("electron", {
+    showMessage: ({type,title,message,buttons}) => {
+        return ipcRenderer.invoke("electron:showMessage", type,title,message,buttons);
+    }
+})
+
 contextBridge.exposeInMainWorld("server", {
     createServer: (name,software,version,{acceptEula = false} = {}) => {
         return ipcRenderer.invoke("server:create",name,software,version,{acceptEula});
@@ -94,5 +102,9 @@ contextBridge.exposeInMainWorld("network", {
     },
     getPortMappings: () => {
         return ipcRenderer.invoke("network:getPortMappings");
+    },
+    getLocalIp: () => {
+        return ipcRenderer.invoke("network:getLocalIp");
     }
+
 })

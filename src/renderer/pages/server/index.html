@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Eleserver</title>
     <link rel="stylesheet" href="style.css">
-    <script src="renderer.js" defer></script>
+    <script type="module" src="renderer.js" defer></script>
 </head>
 <body>
 <div id="home-page">
@@ -26,6 +26,21 @@
             <p id="button-text"></p>
         </button>
     </header>
+    <div class="overlay">
+        <div id="connect-modal">
+            <div id="ip">
+                <div id="local-ip-container">
+                    <strong>Local:</strong>
+                    <span id="local-ip"></span>
+                </div>
+                <div id="public-ip-container">
+                    <strong>Public:</strong>
+                    <span id="public-ip"></span>
+                </div>
+            </div>
+            <button id="port-button">Open Port</button>
+        </div>
+    </div>
 </div>
 </body>
 </html>
