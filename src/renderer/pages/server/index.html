@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline';"/>
     <title>Eleserver</title>
     <link rel="stylesheet" href="style.css">
     <script type="module" src="renderer.js" defer></script>
@@ -40,6 +41,16 @@
             </div>
             <button id="port-button">Open Port</button>
         </div>
+    </div>
+</div>
+<div id="navbar">
+    <div id="homepage" class="page">
+        <img src="../../assets/navbar-icons/home.svg" alt="">
+        Home
+    </div>
+    <div id="console" class="page">
+        <img src="../../assets/navbar-icons/console.svg" alt="">
+        Console
     </div>
 </div>
 </body>

@@ -218,3 +218,38 @@ body {
 #port-button:active {
     transform: scale(0.97);
 }
+
+#navbar {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    background: #121212;
+    height: 70px;
+    width: 100%;
+    border-radius: 6px;
+    user-select: none;
+}
+.page {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: Play, sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+    border: solid 1px #202020;
+    border-radius: 10px;
+    background: #101010;
+    cursor: pointer;
+    transition: transform 100ms;
+}
+.page img {
+    width: 25px;
+    height: 25px;
+}
+.page:hover {
+    transform: scale(1.02);
+}

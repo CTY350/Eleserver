@@ -139,19 +139,41 @@ startButton.addEventListener("click", async () => {
 portButton.addEventListener("click", async () => {
     try {
         await window.network.openPort(serverInfo.properties["server-port"]);
-
+        portButton.innerText = "Port Opened";
+        await window.server.on("close", async () => {
+            await window.network.closePort(serverInfo.properties["server-port"]);
+            portButton.innerText = "Open Port";
+        });
+        portButton.disabled = true;
     }
     catch (e) {
         if (e.message.includes("CGNAT_DETECTED")) {
-            window.electron.showMessage({
+            const result = await window.electron.showMessage({
                 type: "error",
                 title: "Public Connection Unavailable",
                 message: "Your network appears to be behind CGNAT, so Eleserver cannot make this server publicly accessible through port forwarding\nYou can still connect through your local network, or use a tunneling service to make your server public",
                 buttons: ["Open it Anyway", "Cancel"]
             })
+            if (result === 0) {
+                await window.network.openPort(serverInfo.properties["server-port"], {ignoreCGNat: true});
+                portButton.innerText = "Port Opened";
+                await window.server.on("close", async () => {
+                    await window.network.closePort(serverInfo.properties["server-port"]);
+                    portButton.innerText = "Open Port";
+                    portButton.disabled = false;
+                });
+                portButton.disabled = true;
+            }
+        }
+        else if (e.message.includes("UPNP_NOT_AVAILABLE")) {
+            await window.electron.showMessage({
+                type: "error",
+                title: "Port Forwarding Unavailable",
+                message: "Automatic port forwarding is unavailable because UPnP is not supported or enabled on your network.\nYou can still connect locally or configure port forwarding manually through your router."
+            });
         }
     }
-})
+});
 
 
 loadPage();
