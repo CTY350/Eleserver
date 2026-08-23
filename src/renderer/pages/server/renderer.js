@@ -1,1 +1,2 @@
-import "./server.js"
+import "./server.js";
+import "./navbar.js"
