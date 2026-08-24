@@ -6,6 +6,9 @@ const {contextBridge,ipcRenderer} = require("electron");
 contextBridge.exposeInMainWorld("electron", {
     showMessage: ({type,title,message,buttons}) => {
         return ipcRenderer.invoke("electron:showMessage", type,title,message,buttons);
+    },
+    openPath: ({path}) => {
+        return ipcRenderer.invoke("electron:openPath", path);
     }
 })
 
@@ -69,6 +72,9 @@ contextBridge.exposeInMainWorld("server", {
     },
     serverRunning: (id) => {
         return ipcRenderer.invoke("server:serverRunning",id);
+    },
+    serverPath: (id) => {
+        return ipcRenderer.invoke("server:serverPath",id);
     }
 });
 

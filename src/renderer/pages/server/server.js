@@ -121,7 +121,7 @@ startButton.addEventListener("click", async () => {
         setButton("stop");
         startButton.disabled = false;
     });
-    window.server.on("close", async () => {
+    window.server.on("close", () => {
         setStatus("offline");
         setButton("start");
         startButton.disabled = false;
@@ -174,6 +174,13 @@ portButton.addEventListener("click", async () => {
         }
     }
 });
+
+serverName.addEventListener("click", async () => {
+    const result = await window.electron.openPath({path: await window.server.serverPath(id)});
+    if (result) {
+        throw new Error(result);
+    }
+})
 
 
 loadPage();

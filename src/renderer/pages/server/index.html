@@ -9,7 +9,7 @@
     <script type="module" src="renderer.js" defer></script>
 </head>
 <body>
-<div id="home-page">
+<div id="home-page" class="page">
     <header class="server-header">
         <div id="server-main">
             <div id="server-info">
@@ -43,14 +43,24 @@
         </div>
     </div>
 </div>
-<div id="console-page"></div>
+<div id="console-page" class="page">
+    <div id="console-container">
+        <div id="console"></div>
+        <div id="console-input">
+            <img src="../../assets/prompt.svg" alt="">
+            <form id="console-form">
+                <input type="text" placeholder="Type here..." id="input">
+            </form>
+        </div>
+    </div>
+</div>
 
 <div id="navbar">
-    <div id="home" class="page">
+    <div id="home-bar" class="page-bar">
         <img src="../../assets/navbar-icons/home.svg" alt="">
         Home
     </div>
-    <div id="console" class="page">
+    <div id="console-bar" class="page-bar">
         <img src="../../assets/navbar-icons/console.svg" alt="">
         Console
     </div>

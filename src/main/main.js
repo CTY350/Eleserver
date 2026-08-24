@@ -1,4 +1,4 @@
-import {BrowserWindow,app,ipcMain,Menu,dialog} from "electron";
+import {BrowserWindow,app,ipcMain,Menu,dialog,shell} from "electron";
 import {initialize} from "../backend/initialize/initialize.js";
 
 import {ServerManager} from "../backend/managers/ServerManager.js";
@@ -75,6 +75,11 @@ ipcMain.handle("electron:showMessage", async (_, type,title,message, buttons) =>
     return result.response;
 });
 
+ipcMain.handle("electron:openPath", async (_, path) => {
+    const result = await shell.openPath(path);
+    return result;
+})
+
 // ━━━━━━━━━━━━━━━━━━━━━━
 
 ipcMain.handle("server:create",(_,name,software,version,{acceptEula = false} = {}) => {
@@ -122,6 +127,10 @@ ipcMain.handle("server:getLogo",(_,id) => {
 });
 ipcMain.handle("server:serverRunning",(_,id) => {
     return serverManager.serverRunning(id);
+});
+
+ipcMain.handle("server:serverPath",(_,id) => {
+    return serverManager.serverPath(id);
 })
 
 // ━━━━━━━━━━━━━━━━━━━━━━

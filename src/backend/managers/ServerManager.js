@@ -333,6 +333,9 @@ export class ServerManager {
     serverRunning(id) {
         return this.#processes.has(id);
     }
+    serverPath(id) {
+        return path.join(basePaths.servers, id);
+    }
 }
 
 export {serverEvents}
