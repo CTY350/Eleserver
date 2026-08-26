@@ -30,7 +30,7 @@ function startApp() {
             preload: path.join(__dirname, 'preload.js'),
         }
     });
-    // Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(null);
     win.loadFile("src/renderer/pages/home/index.html");
 }
 
