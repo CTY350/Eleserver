@@ -1,6 +1,6 @@
 import {writeFile,mkdir,readFile,readdir,rm,cp} from "node:fs/promises";
 import {randomBytes} from "node:crypto";
-import {VersionManager} from "./versionManager.js";
+import {VersionManager} from "./VersionManager.js";
 import {JavaManager} from './JavaManager.js';
 import {pipeline} from 'node:stream/promises';
 import {createWriteStream,existsSync} from 'node:fs';
