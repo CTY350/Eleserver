@@ -12,7 +12,8 @@
   "license": "MIT",
   "type": "module",
   "devDependencies": {
-    "electron": "^43.1.1"
+    "electron": "^43.1.1",
+    "electron-builder": "^26.15.3"
   },
   "dependencies": {
     "extract-zip": "^2.0.1",

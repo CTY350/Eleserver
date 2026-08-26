@@ -29,7 +29,7 @@ async function loadServers() {
         const versionImage = document.createElement("img");
         const text = document.createElement("p");
         text.textContent = `${server.software} · ${server.version}`;
-        versionImage.src = `../../assets/software-icons/${server.software}.png`
+        versionImage.src = `../../assets/software-icons/${server.software}.png`;
         versionImage.classList.add("version-icon");
         version.append(versionImage,text);
 
@@ -38,7 +38,7 @@ async function loadServers() {
         const image = document.createElement("img");
         let logo;
         try {
-            logo = await window.server.getServerLogo(server.id)
+            logo = await window.server.getServerLogo(server.id);
         }
         catch (e) {
             logo = "../../assets/server-icon.png";
@@ -48,17 +48,58 @@ async function loadServers() {
         image.classList.add("server-img");
         serverInfo.classList.add("server-info");
 
+        const imageOverlay = document.createElement("div");
+        imageOverlay.classList.add("image-overlay");
+        const overlayImage = document.createElement("img");
+        overlayImage.src = "../../assets/edit.svg";
+        imageOverlay.appendChild(overlayImage);
+
         serverInfo.append(title,id,version);
-        serverIcon.append(image);
+        serverIcon.append(image,imageOverlay);
 
+        serverIcon.addEventListener("click", async () => {
+            const result = await window.electron.choosePath({
+                properties: ["openFile"],
+                title: "Select Server Icon",
+                filters: [{
+                    name: "Minecraft Server Icon",
+                    extensions: ["png"]
+                }]
+            });
+            await window.server.setServerLogo(server.id,result.filePaths[0]);
+            loadServers();
+        })
 
-        card.addEventListener("click", () => {
-            sessionStorage.setItem("serverId", server.id);
-            window.location.href = "../server/index.html";
+        const deleteButton = document.createElement("div");
+        const deleteIcon = document.createElement("img");
+        deleteIcon.src = `../../assets/trash.svg`;
+        deleteButton.classList.add("card-delete-button");
+        deleteButton.appendChild(deleteIcon);
+
+        deleteButton.addEventListener("click", async () => {
+           const result = await window.electron.showMessage({
+               type: "warning",
+               title: "Deleting server",
+               message: "Are you sure?",
+               buttons: ["Yes", "No"]
+           });
+           if (result === 0) {
+               await window.server.deleteServer(server.id);
+               loadServers();
+           }
+        });
+
+        card.addEventListener("click", (event) => {
+            if (event.target === card) {
+                sessionStorage.setItem("serverId", server.id);
+                window.location.href = "../server/index.html";
+            }
+
         })
 
         card.appendChild(serverIcon);
         card.appendChild(serverInfo);
+        card.appendChild(deleteButton);
         serverList.appendChild(card);
     }
 }
@@ -67,6 +108,7 @@ async function loadServers() {
 
 const overlay = document.querySelector(".overlay");
 const createButton = document.querySelector(".create-button");
+const deleteButton = document.querySelector(".delete-button");
 
 overlay.addEventListener("click", (event) => {
     if (event.target === overlay) {
@@ -75,6 +117,13 @@ overlay.addEventListener("click", (event) => {
 });
 createButton.addEventListener("click", () => {
     overlay.style.display = "flex";
+})
+
+deleteButton.addEventListener("click", () => {
+    const deleteButtons = document.querySelectorAll(".card-delete-button");
+    for (const deleteButton of deleteButtons) {
+        deleteButton.style.display = "flex";
+    }
 })
 
 
@@ -155,7 +204,17 @@ form.addEventListener("submit", async (event) => {
     versionSelect.disabled = true;
 
 
-    await window.server.createServer(data.get("serverName").trim(),data.get("serverSoftware"),data.get("serverVersion"),{acceptEula: true});
+    try {
+        await window.server.createServer(data.get("serverName").trim(),data.get("serverSoftware"),data.get("serverVersion"),{acceptEula: true});
+    }
+    catch (e) {
+        await window.electron.showMessage({
+            type: "error",
+            title: "Server Create Error",
+            message: e.message
+        });
+    }
+
 
     loadServers();
     overlay.style.display = "none";

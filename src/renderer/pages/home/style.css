@@ -70,6 +70,7 @@ main {
     display: flex;
     justify-content: flex-end;
     margin: 0 auto;
+    gap: 16px;
 }
 
 
@@ -95,6 +96,35 @@ main {
 }
 .create-button:hover {
     background-color: #0071e2;
+}
+
+.delete-button {
+    width: 33px;
+    height: 33px;
+    border: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #121212;
+    cursor: pointer;
+}
+.delete-button img {
+    width: 30px;
+    height: 30px;
+}
+
+.card-delete-button {
+    border: none;
+    background: #E2214B;
+    height: 100%;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    margin-left: auto;
+    width: 50px;
+}
+.card-delete-button:hover {
+    background: #e10a3e;
 }
 
 
@@ -141,6 +171,24 @@ main {
     padding: 0;
     margin: 0;
     image-rendering: pixelated;
+    position: relative;
+}
+
+.image-overlay {
+    opacity: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: black;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.2s;
+}
+
+.server-icon:hover .image-overlay {
+    opacity: 0.5;
 }
 .server-img {
     width: 100%;
@@ -148,6 +196,7 @@ main {
     object-fit: cover;
     padding: 0;
     margin: 0;
+
 }
 .server-info {
     display: flex;

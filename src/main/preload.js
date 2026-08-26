@@ -9,6 +9,9 @@ contextBridge.exposeInMainWorld("electron", {
     },
     openPath: ({path}) => {
         return ipcRenderer.invoke("electron:openPath", path);
+    },
+    choosePath: ({properties, title,filters}) => {
+        return ipcRenderer.invoke("electron:choosePath", properties, title,filters);
     }
 })
 

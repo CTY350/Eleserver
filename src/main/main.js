@@ -79,6 +79,14 @@ ipcMain.handle("electron:openPath", async (_, path) => {
     const result = await shell.openPath(path);
     return result;
 })
+ipcMain.handle("electron:choosePath", async (_,properties,title,filters) => {
+    const result = await dialog.showOpenDialog({
+        properties: [properties],
+        title: title,
+        filters: filters
+    });
+    return result;
+})
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 

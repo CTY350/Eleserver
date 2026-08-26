@@ -3,7 +3,7 @@ import {randomBytes} from "node:crypto";
 import {VersionManager} from "./versionManager.js";
 import {JavaManager} from './JavaManager.js';
 import {pipeline} from 'node:stream/promises';
-import {createWriteStream} from 'node:fs';
+import {createWriteStream,existsSync} from 'node:fs';
 import {basePaths} from '../paths.js'
 import path from 'path';
 import {spawn} from 'child_process';
@@ -78,6 +78,9 @@ export class ServerManager {
         const jarPath = path.join(basePaths.downloads, software, String(version));
         const dirList = await readdir(jarPath);
         const jar = dirList.find(file => file.endsWith(".jar"));
+        if (software === "forge" && !jar) {
+            return undefined;
+        }
         if (!jar) {
             throw new Error("server.jar not found.");
         }
@@ -106,6 +109,8 @@ export class ServerManager {
         const javaPath = await javaManager.ensureJava(await versionManager.getJavaVersion(config.version));
         const serverFolder = path.join(basePaths.servers, id);
         const jar = await this.#ensureServer(config.software,config.version);
+        let args = [];
+
         if (config.software === "forge") {
             const libraries = path.join(basePaths.downloads, config.software, config.version,"libraries");
             const lib = path.join(basePaths.servers,id,"libraries");
@@ -114,23 +119,45 @@ export class ServerManager {
             if (readLib.length === 0) {
                 await cp(libraries,lib,{recursive: true});
             }
+            if (!jar) {
+                const argsDir = await readdir(path.join(lib, "net","minecraftforge","forge"));
+                let argsOS;
+                if (process.platform === "win32") {
+                    argsOS = "win_args.txt"
+                } else {
+                    argsOS = "unix_args.txt"
+                }
+                const forgeArgs = path.join(lib, "net", "minecraftforge", "forge",argsDir[0], argsOS);
+                if (!existsSync(forgeArgs)) {
+                    throw new Error("Forge Args not found");
+                }
+                args = [
+                    `-Xms${config.minRam}`,
+                    `-Xmx${config.maxRam}`,
+                    ...config.jvmArguments,
+                    `@${forgeArgs}`,
+                    "nogui"
+                ]
+            }
+
+
         }
-        if (!jar) {
+        if (!jar && args.length === 0) {
             throw new Error("Server.jar not found!");
         }
 
-        const serverProcess = spawn(
-            javaPath, [
+        if (args.length === 0) {
+            args = [
                 `-Xms${config.minRam}`,
                 `-Xmx${config.maxRam}`,
-                "-Djava.net.preferIPv6Addresses=system",
                 ...config.jvmArguments,
                 "-jar",
                 jar,
                 "nogui"
-            ],
-            {cwd: serverFolder}
-        )
+            ]
+        }
+
+        const serverProcess = spawn(javaPath, args, {cwd: serverFolder})
 
         return serverProcess;
 
@@ -191,8 +218,14 @@ export class ServerManager {
         const id = randomBytes(8).toString("hex");
         await mkdir(path.join(basePaths.servers, id));
         await this.#createEleserver(id, name, software, version, "2G", "4G",Date.now());
-
-        const serverProcess = await this.#startServerInternal(id);
+        let serverProcess;
+        try {
+            serverProcess = await this.#startServerInternal(id);
+        }
+        catch (e) {
+            await this.deleteServer(id);
+            throw e;
+        }
 
         await new Promise((resolve, reject) => {
             serverProcess.on("exit", async() => {
@@ -201,10 +234,10 @@ export class ServerManager {
                     await writeFile(eulaPath, "eula=true");
 
                     await this.startServer(id);
-                    await this.stopServer(id);
+                    this.stopServer(id);
                     if (!acceptEula) {
                         // await writeFile(eulaPath, "eula=false");
-                    };
+                    }
                     resolve();
                 } catch (e) {
                     reject(e);
@@ -212,6 +245,7 @@ export class ServerManager {
 
             });
         });
+        return id;
 
     }
 
@@ -318,7 +352,7 @@ export class ServerManager {
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(serverInfo, null, 4));
     }
 
-    async setServerLogo(id, PngPath) {
+    async setServerLogo(id, pngPath) {
         const serverPath = path.join(basePaths.servers, id);
         const logoPath = path.join(serverPath, "server-icon.png");
 
@@ -337,5 +371,6 @@ export class ServerManager {
         return path.join(basePaths.servers, id);
     }
 }
-
+// const server = new ServerManager();
+// await server.setServerLogo("5302e732cd583858","C:\\Users\\Joker\\Downloads\\forge-800x800.png");
 export {serverEvents}
