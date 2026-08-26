@@ -72,7 +72,7 @@ async function loadServers() {
 
         const deleteButton = document.createElement("div");
         const deleteIcon = document.createElement("img");
-        deleteIcon.src = `../../assets/trash.svg`;
+        deleteIcon.src = `../../assets/delete.svg`;
         deleteButton.classList.add("card-delete-button");
         deleteButton.appendChild(deleteIcon);
 
@@ -117,13 +117,27 @@ overlay.addEventListener("click", (event) => {
 });
 createButton.addEventListener("click", () => {
     overlay.style.display = "flex";
-})
+});
+
+let deleteMode = false;
 
 deleteButton.addEventListener("click", () => {
+    const deleteImg = document.querySelector("#delete-img");
     const deleteButtons = document.querySelectorAll(".card-delete-button");
-    for (const deleteButton of deleteButtons) {
-        deleteButton.style.display = "flex";
+    if (!deleteMode) {
+        for (const deleteButton of deleteButtons) {
+            deleteButton.style.display = "flex";
+        }
+        deleteImg.src = "../../assets/cancel.svg";
+        deleteMode = true;
+    } else {
+        for (const deleteButton of deleteButtons) {
+            deleteButton.style.display = "none";
+        }
+        deleteImg.src = "../../assets/delete.svg";
+        deleteMode = false;
     }
+
 })
 
 

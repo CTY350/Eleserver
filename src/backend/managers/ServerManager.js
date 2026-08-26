@@ -25,6 +25,7 @@ export class ServerManager {
     // ━━━━━━━━━━━━━━━━━━━━━━
 
     async #installServer(software, version) {
+        console.log("Installing server");
         const data = await versionManager.getServerDownloadUrl(software, version);
         const url = data.downloadUrl;
         const type = data.downloadType;
@@ -72,6 +73,7 @@ export class ServerManager {
 
             })
         }
+        console.log("Server Successfully installed");
     }
 
     async #locateServer(software, version) {
@@ -106,9 +108,12 @@ export class ServerManager {
 
     async #startServerInternal(id) {
         const config = await this.#getServerInfo(id);
+        console.log("Config Found")
         const javaPath = await javaManager.ensureJava(await versionManager.getJavaVersion(config.version));
+        console.log("Java Found");
         const serverFolder = path.join(basePaths.servers, id);
         const jar = await this.#ensureServer(config.software,config.version);
+        console.log("Server Found");
         let args = [];
 
         if (config.software === "forge") {
@@ -158,12 +163,13 @@ export class ServerManager {
         }
 
         const serverProcess = spawn(javaPath, args, {cwd: serverFolder})
-
+        console.log("Server started");
         return serverProcess;
 
     }
 
     async #createEleserver(id, name, software, version, minRam, maxRam,timestamp) {
+        console.log("Creating Eleserver.json")
         const content = {
             "id": id,
             "name": name,
@@ -175,6 +181,7 @@ export class ServerManager {
             "jvmArguments": []
         }
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(content, null, 4));
+        console.log("Eleserver.json created")
     }
 
 
@@ -215,12 +222,18 @@ export class ServerManager {
     // ━━━━━━━━━━━━━━━━━━━━━━
 
     async createServer(name, software, version, {acceptEula = false} = {}) {
+        console.log("Creating server");
         const id = randomBytes(8).toString("hex");
         await mkdir(path.join(basePaths.servers, id));
         await this.#createEleserver(id, name, software, version, "2G", "4G",Date.now());
         let serverProcess;
         try {
             serverProcess = await this.#startServerInternal(id);
+            serverProcess.stdout.on("data", async (data) => {
+                if (data.toString().includes("You need to agree to the EULA in order to run the server")) {
+                    serverProcess.kill()
+                }
+            })
         }
         catch (e) {
             await this.deleteServer(id);
@@ -228,17 +241,19 @@ export class ServerManager {
         }
 
         await new Promise((resolve, reject) => {
-            serverProcess.on("exit", async() => {
+            serverProcess.on("exit", async () => {
                 try {
+
                     const eulaPath = path.join(basePaths.servers, id, "eula.txt");
                     await writeFile(eulaPath, "eula=true");
 
                     await this.startServer(id);
-                    this.stopServer(id);
+                    await this.stopServer(id);
                     if (!acceptEula) {
                         // await writeFile(eulaPath, "eula=false");
                     }
                     resolve();
+                    console.log("ServerProcess Exit ended");
                 } catch (e) {
                     reject(e);
                 }
@@ -268,7 +283,7 @@ export class ServerManager {
                 serverEvents.emit("server-error", id,error);
                 reject(error);
             });
-            serverProcess.stdout.on("data", data => {
+            serverProcess.stdout.on("data", (data) => {
                 console.log(data.toString());
                 serverEvents.emit("server-log", id,data.toString());
 
@@ -281,19 +296,26 @@ export class ServerManager {
 
     }
 
-    stopServer(id,{force = false} = {}) {
+    async stopServer(id,{force = false} = {}) {
         if (!this.#processes.has(id)) {
             throw new Error("Server is not running");
         }
 
         const serverProcess = this.#processes.get(id);
+        return new Promise((resolve, reject) => {
+            if (force) {
+                serverProcess.kill();
+                resolve();
+            }
+            else {
+                serverProcess.stdin.write("stop\n");
+                serverProcess.on("close", () => {
+                    console.log("Server stopped");
+                    resolve();
+                });
+            }
+        })
 
-        if (force) {
-            serverProcess.kill()
-        }
-        else {
-            serverProcess.stdin.write("stop\n");
-        }
     }
 
     async deleteServer(id) {
@@ -371,6 +393,4 @@ export class ServerManager {
         return path.join(basePaths.servers, id);
     }
 }
-// const server = new ServerManager();
-// await server.setServerLogo("5302e732cd583858","C:\\Users\\Joker\\Downloads\\forge-800x800.png");
 export {serverEvents}

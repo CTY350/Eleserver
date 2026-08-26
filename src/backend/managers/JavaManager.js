@@ -1,4 +1,3 @@
-// TODO: Report installation status
 
 import {createWriteStream} from 'node:fs';
 import {pipeline} from 'node:stream/promises';
@@ -33,8 +32,12 @@ const javaExecutable =
 export class JavaManager {
 
     async #installJava(javaVersion){
+        console.log("Installing Java");
         const url = `https://api.adoptium.net/v3/binary/latest/${javaVersion}/ga/${system.platform}/${system.architecture}/jdk/hotspot/normal/eclipse`;
         const response = await fetch(url);
+        console.log("status:",response.status);
+        console.log("type:",response.headers.get("content-type"));
+        console.log("length:", response.headers.get("content-length"));
         if (!response.ok) {
             throw new Error(`Failed to install Java: ${javaVersion}`);
         }
@@ -45,9 +48,12 @@ export class JavaManager {
             response.body,
             file
         )
+        console.log("Successfully installed Java");
 
+        console.log("Extracting Java");
         await extract(path.join(dir,"java.zip"),{dir: dir})
         await unlink(path.join(dir,"java.zip"));
+        console.log("Successfully extracted Java");
     }
     async #locateJava(javaVersion) {
         const javaDir = path.join(basePaths.java, String(javaVersion));

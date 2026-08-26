@@ -262,7 +262,10 @@ export class VersionManager {
                 const buildData = await builds.json();
                 for (const buildInfo of buildData) {
                     if (buildInfo.channel === "STABLE") {
-                        return buildInfo.downloads["server:default"].url
+                        return {
+                            "downloadUrl": buildInfo.downloads["server:default"].url,
+                            "downloadType": VersionManager.DownloadTypes.SERVER
+                        }
                     }
                 }
                 return {
@@ -286,3 +289,5 @@ export class VersionManager {
         }
     }
 }
+const versionManager = new VersionManager();
+console.log(await versionManager.getServerDownloadUrl("paper","26.2"));
