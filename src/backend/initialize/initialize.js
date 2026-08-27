@@ -8,4 +8,5 @@ export function initialize() {
     fs.mkdirSync(basePaths.downloads, { recursive: true });
     fs.mkdirSync(basePaths.java, { recursive: true });
     fs.mkdirSync(basePaths.versions, { recursive: true });
+    fs.mkdirSync(basePaths.logs, { recursive: true });
 }

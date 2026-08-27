@@ -1,7 +1,7 @@
 {
   "name": "eleserver",
   "productName": "Eleserver",
-  "version": "0.1.0-beta.3",
+  "version": "0.1.0-beta.4",
   "description": "Local minecraft server manager.",
   "main": "src/main/main.js",
   "scripts": {
@@ -10,7 +10,7 @@
     "build": "electron-builder"
   },
   "keywords": [],
-  "author": "Ömer Faruk Duman",
+  "author": "CTY250",
   "license": "MIT",
   "type": "module",
   "devDependencies": {

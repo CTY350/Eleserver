@@ -10,6 +10,7 @@ export const basePaths = {
     downloads: path.join(basePath, "downloads"),
     java: path.join(basePath, "java"),
     versions: path.join(basePath, "versions"),
+    logs: path.join(basePath, "logs"),
 }
 
 const baseVersionPath = path.join(basePath, "versions");
