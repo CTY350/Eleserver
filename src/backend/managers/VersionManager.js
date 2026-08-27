@@ -289,5 +289,3 @@ export class VersionManager {
         }
     }
 }
-const versionManager = new VersionManager();
-console.log(await versionManager.getServerDownloadUrl("paper","26.2"));
