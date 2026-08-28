@@ -163,7 +163,7 @@ async function updateVersions() {
             break;
         }
         case "paper": {
-            versions = await window.version.getPurpurVersions();
+            versions = await window.version.getPaperVersions();
             break;
         }
         case "purpur": {

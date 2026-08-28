@@ -21,6 +21,7 @@
     "extract-zip": "^2.0.1",
     "fast-xml-parser": "^5.10.1",
     "nat-upnp": "^1.1.1",
+    "npm": "^11.19.1",
     "sharp": "^0.35.3"
   }
 }
