@@ -6,7 +6,7 @@ import {appendFile} from "node:fs/promises";
 const logEvents = new EventEmitter();
 
 class LogManager {
-
+    #flushTimer;
     constructor() {
         this.#flushTimer = setInterval(() => {
             this.#flush();
@@ -73,29 +73,32 @@ class LogManager {
     }
 
 
-    info(message) {
+    info(...messages) {
+        const message = messages.join(" ");
         const log = this.#formatLog("info",message);
         console.log(log);
 
-        logEvents.emit("log", log);
+        logEvents.emit("log", "info",log);
 
         this.#logs.push(log);
     }
 
-    warn(message) {
+    warn(...messages) {
+        const message = messages.join(" ");
         const log = this.#formatLog("warn",message);
-        console.log(log);
+        console.warn(log);
 
-        logEvents.emit("log", log);
+        logEvents.emit("log", "warn",log);
 
         this.#logs.push(log);
     }
 
-    error(message) {
+    error(...messages) {
+        const message = messages.join(" ");
         const log = this.#formatLog("error",message);
-        console.log(log);
+        console.error(log);
 
-        logEvents.emit("log", log);
+        logEvents.emit("log", "error",log);
 
         this.#logs.push(log);
     }
@@ -105,3 +108,5 @@ class LogManager {
         await this.#flush();
     }
 }
+const logger = new LogManager();
+export {logger, logEvents};

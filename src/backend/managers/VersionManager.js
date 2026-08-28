@@ -3,7 +3,7 @@ import {writeFile} from 'node:fs/promises';
 import {readFile} from 'node:fs/promises';
 import {endpoints} from "../endpoints.js";
 import {XMLParser} from "fast-xml-parser";
-
+import {logger} from "./LogManager.js";
 
 export class VersionManager {
 
@@ -13,6 +13,7 @@ export class VersionManager {
     })
 
     async #updateVersionCache(software, newVersions) {
+        logger.info("Updating version cache");
         if (!(software in versionPaths)) {
             throw new Error(`Invalid software in versionPaths`);
         }
@@ -24,6 +25,7 @@ export class VersionManager {
             throw new Error(`Invalid software in endpoints`);
         }
         try {
+            logger.info("Fetching versions for", software);
             const response = await fetch(endpoints[software]);
             if (!response.ok) {
                 throw new Error(`Failed to fetch versions for: ${software}`);
@@ -41,13 +43,13 @@ export class VersionManager {
             return data;
         }
         catch (error) {
-            console.error(error);
+            logger.error(error);
             try {
                 const cache = await readFile(versionPaths[software], 'utf8');
                 return JSON.parse(cache);
             }
             catch (error) {
-                console.error(error);
+
                 throw new Error(`No cached versions found for ${software} Error: ${error.message}`);
             }
         }

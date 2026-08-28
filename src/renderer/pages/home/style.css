@@ -107,6 +107,7 @@ main {
     align-items: center;
     background: #121212;
     cursor: pointer;
+    user-select: none;
 }
 .delete-button img {
     width: 30px;

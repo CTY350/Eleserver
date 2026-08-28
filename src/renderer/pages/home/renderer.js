@@ -37,12 +37,12 @@ async function loadServers() {
 
         const image = document.createElement("img");
         let logo;
-        try {
-            logo = await window.server.getServerLogo(server.id);
-        }
-        catch (e) {
+
+        logo = await window.server.getServerLogo(server.id);
+        if (logo === null) {
             logo = "../../assets/server-icon.png";
         }
+
         image.src = logo;
         serverIcon.classList.add("server-icon");
         image.classList.add("server-img");
@@ -57,7 +57,7 @@ async function loadServers() {
         serverInfo.append(title,id,version);
         serverIcon.append(image,imageOverlay);
 
-        serverIcon.addEventListener("click", async () => {
+        serverIcon.addEventListener("click", async (event) => {
             const result = await window.electron.choosePath({
                 properties: ["openFile"],
                 title: "Select Server Icon",
@@ -66,7 +66,9 @@ async function loadServers() {
                     extensions: ["png"]
                 }]
             });
-            await window.server.setServerLogo(server.id,result.filePaths[0]);
+            if (result.canceled) {return}
+            await window.server.setServerLogo(server.id, result.filePaths[0]);
+
             loadServers();
         })
 

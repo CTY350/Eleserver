@@ -5,7 +5,7 @@ import {basePaths} from '../paths.js';
 import path from 'node:path';
 import {mkdir,unlink,readdir} from 'node:fs/promises';
 import extract from "extract-zip";
-
+import {logger} from './LogManager.js';
 
 const platforms = {
     win32: "windows",
@@ -32,12 +32,12 @@ const javaExecutable =
 export class JavaManager {
 
     async #installJava(javaVersion){
-        console.log("Installing Java");
+        logger.info("Installing Java");
         const url = `https://api.adoptium.net/v3/binary/latest/${javaVersion}/ga/${system.platform}/${system.architecture}/jdk/hotspot/normal/eclipse`;
         const response = await fetch(url);
-        console.log("status:",response.status);
-        console.log("type:",response.headers.get("content-type"));
-        console.log("length:", response.headers.get("content-length"));
+        logger.info("status:",response.status);
+        logger.info("type:",response.headers.get("content-type"));
+        logger.info("length:", response.headers.get("content-length"));
         if (!response.ok) {
             throw new Error(`Failed to install Java: ${javaVersion}`);
         }
@@ -48,12 +48,12 @@ export class JavaManager {
             response.body,
             file
         )
-        console.log("Successfully installed Java");
+        logger.info("Successfully installed Java");
 
-        console.log("Extracting Java");
+        logger.info("Extracting Java");
         await extract(path.join(dir,"java.zip"),{dir: dir})
         await unlink(path.join(dir,"java.zip"));
-        console.log("Successfully extracted Java");
+        logger.info("Successfully extracted Java");
     }
     async #locateJava(javaVersion) {
         const javaDir = path.join(basePaths.java, String(javaVersion));

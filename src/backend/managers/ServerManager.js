@@ -10,6 +10,7 @@ import {spawn} from 'child_process';
 import os from 'node:os';
 import sharp from 'sharp';
 import EventEmitter from "node:events";
+import {logger} from "./LogManager.js";
 
 const versionManager = new VersionManager();
 const javaManager = new JavaManager();
@@ -25,15 +26,16 @@ export class ServerManager {
     // ━━━━━━━━━━━━━━━━━━━━━━
 
     async #installServer(software, version) {
-        console.log("Installing server");
+        logger.info("Installing server...");
         const data = await versionManager.getServerDownloadUrl(software, version);
         const url = data.downloadUrl;
         const type = data.downloadType;
         const response = await fetch(url);
-        console.log("status:",response.status);
-        console.log("type:",response.headers.get("content-type"));
-        console.log("length:", response.headers.get("content-length"));
+        logger.info("status:",response.status);
+        logger.info("type:",response.headers.get("content-type"));
+        logger.info("length:", response.headers.get("content-length"));
 
+        logger.info("Server Type:",type);
         if (type === "server") {
             const dir = path.join(basePaths.downloads, software, String(version));
             await mkdir(dir, {recursive: true});
@@ -57,23 +59,24 @@ export class ServerManager {
                     ],
                     {cwd: serverJarDir}
                 )
+                logger.info("Installing server...");
 
                 installerProcess.stdout.on("data", (data) => {
-                    console.log(data.toString());
+                    logger.info(data.toString())
                 });
                 installerProcess.stderr.on("data", (data) => {
-                    console.error(data.toString());
+                    logger.error(data.toString());
                 });
 
                 installerProcess.on("close", async () => {
-                    console.log("Installer process closed");
+                    logger.info("Installer process closed.");
                     resolve();
                     await rm(dir, {recursive: true});
                 })
 
             })
         }
-        console.log("Server Successfully installed");
+        logger.info("Server Successfully installed");
     }
 
     async #locateServer(software, version) {
@@ -108,12 +111,12 @@ export class ServerManager {
 
     async #startServerInternal(id) {
         const config = await this.#getServerInfo(id);
-        console.log("Config Found")
+        logger.info("Config Found")
         const javaPath = await javaManager.ensureJava(await versionManager.getJavaVersion(config.version));
-        console.log("Java Found");
+        logger.info("Java Found");
         const serverFolder = path.join(basePaths.servers, id);
         const jar = await this.#ensureServer(config.software,config.version);
-        console.log("Server Found");
+        logger.info("Server Found");
         let args = [];
 
         if (config.software === "forge") {
@@ -163,13 +166,13 @@ export class ServerManager {
         }
 
         const serverProcess = spawn(javaPath, args, {cwd: serverFolder})
-        console.log("Server started");
+
         return serverProcess;
 
     }
 
     async #createEleserver(id, name, software, version, minRam, maxRam,timestamp) {
-        console.log("Creating Eleserver.json")
+        logger.info("Creating Eleserver.json")
         const content = {
             "id": id,
             "name": name,
@@ -181,7 +184,7 @@ export class ServerManager {
             "jvmArguments": []
         }
         await writeFile(path.join(basePaths.servers, id, "eleserver.json"), JSON.stringify(content, null, 4));
-        console.log("Eleserver.json created")
+        logger.info("Eleserver.json created")
     }
 
 
@@ -222,7 +225,8 @@ export class ServerManager {
     // ━━━━━━━━━━━━━━━━━━━━━━
 
     async createServer(name, software, version, {acceptEula = false} = {}) {
-        console.log("Creating server");
+        logger.info("Creating server");
+        logger.info("Creating ID");
         const id = randomBytes(8).toString("hex");
         await mkdir(path.join(basePaths.servers, id));
         await this.#createEleserver(id, name, software, version, "2G", "4G",Date.now());
@@ -253,7 +257,6 @@ export class ServerManager {
                         // await writeFile(eulaPath, "eula=false");
                     }
                     resolve();
-                    console.log("ServerProcess Exit ended");
                 } catch (e) {
                     reject(e);
                 }
@@ -310,7 +313,7 @@ export class ServerManager {
             else {
                 serverProcess.stdin.write("stop\n");
                 serverProcess.on("close", () => {
-                    console.log("Server stopped");
+                    logger.info("Server stopped");
                     resolve();
                 });
             }
@@ -381,10 +384,18 @@ export class ServerManager {
         await sharp(pngPath).resize(64,64, {fit: "cover"}).png().toFile(logoPath);
     }
     async getServerLogo(id) {
-        const logoPath = path.join(basePaths.servers, id, "server-icon.png");
-        const logo = await readFile(logoPath);
+        try {
+            const logoPath = path.join(basePaths.servers, id, "server-icon.png");
+            const logo = await readFile(logoPath);
 
-        return `data:image/png;base64,${logo.toString("base64")}`;
+            return `data:image/png;base64,${logo.toString("base64")}`;
+        }
+        catch (error) {
+            logger.warn("No logo found for server", id);
+            return null;
+        }
+
+
     }
     serverRunning(id) {
         return this.#processes.has(id);

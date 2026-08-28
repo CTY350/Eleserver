@@ -3,6 +3,18 @@ const {contextBridge,ipcRenderer} = require("electron");
 
 
 
+ipcRenderer.on("log", (_,type,data) => {
+    if (type === "info") {
+        console.log(data);
+    }
+    else if (type === "warn") {
+        console.warn(data);
+    }
+    else if (type === "error") {
+        console.error(data);
+    }
+});
+
 contextBridge.exposeInMainWorld("electron", {
     showMessage: ({type,title,message,buttons}) => {
         return ipcRenderer.invoke("electron:showMessage", type,title,message,buttons);
@@ -13,7 +25,7 @@ contextBridge.exposeInMainWorld("electron", {
     choosePath: ({properties, title,filters}) => {
         return ipcRenderer.invoke("electron:choosePath", properties, title,filters);
     }
-})
+});
 
 contextBridge.exposeInMainWorld("server", {
     createServer: (name,software,version,{acceptEula = false} = {}) => {
@@ -50,7 +62,7 @@ contextBridge.exposeInMainWorld("server", {
         return ipcRenderer.invoke("server:getLogo",id);
     },
     on: (event,callback) => {
-        console.log("handling", event);
+
         switch (event) {
             case "start": {
                 ipcRenderer.on("server-started", (_,id) => {callback(id);});
@@ -115,5 +127,4 @@ contextBridge.exposeInMainWorld("network", {
     getLocalIp: () => {
         return ipcRenderer.invoke("network:getLocalIp");
     }
-
-})
+});

@@ -5,6 +5,8 @@ import {ServerManager} from "../backend/managers/ServerManager.js";
 import {VersionManager} from "../backend/managers/VersionManager.js";
 import {NetworkManager} from "../backend/managers/NetworkManager.js";
 
+import {logger,logEvents} from '../backend/managers/LogManager.js';
+
 import {serverEvents} from "../backend/managers/ServerManager.js";
 
 import path from "node:path";
@@ -30,7 +32,7 @@ function startApp() {
             preload: path.join(__dirname, 'preload.js'),
         }
     });
-    Menu.setApplicationMenu(null);
+    // Menu.setApplicationMenu(null);
     win.loadFile("src/renderer/pages/home/index.html");
 }
 
@@ -62,10 +64,27 @@ serverEvents.on("server-log", (id,data) => {
     win.webContents.send("server-log",id,data);
 });
 
+logEvents.on("log", (type,data) => {
+    win.webContents.send("log",type,data);
+});
+
+
+
+function handleIpc(channel,handler) {
+    ipcMain.handle(channel, async (event,...args) => {
+        try {
+            return await handler(event,...args);
+        }
+        catch(err) {
+            logger.error(err);
+            throw err;
+        }
+    });
+}
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
-ipcMain.handle("electron:showMessage", async (_, type,title,message, buttons) => {
+handleIpc("electron:showMessage", async (_, type,title,message, buttons) => {
     const result = await dialog.showMessageBox({
         type: type,
         title: title,
@@ -75,11 +94,11 @@ ipcMain.handle("electron:showMessage", async (_, type,title,message, buttons) =>
     return result.response;
 });
 
-ipcMain.handle("electron:openPath", async (_, path) => {
+handleIpc("electron:openPath", async (_, path) => {
     const result = await shell.openPath(path);
     return result;
 })
-ipcMain.handle("electron:choosePath", async (_,properties,title,filters) => {
+handleIpc("electron:choosePath", async (_,properties,title,filters) => {
     const result = await dialog.showOpenDialog({
         properties: [properties],
         title: title,
@@ -90,97 +109,97 @@ ipcMain.handle("electron:choosePath", async (_,properties,title,filters) => {
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
-ipcMain.handle("server:create",(_,name,software,version,{acceptEula = false} = {}) => {
+handleIpc("server:create",(_,name,software,version,{acceptEula = false} = {}) => {
     return serverManager.createServer(name, software, version , {acceptEula});
 });
 
-ipcMain.handle("server:start",(_,id) => {
+handleIpc("server:start",(_,id) => {
     return serverManager.startServer(id);
 });
 
-ipcMain.handle("server:stop",(_,id,{force = false} = {}) => {
+handleIpc("server:stop",(_,id,{force = false} = {}) => {
     return serverManager.stopServer(id,{force});
 });
 
-ipcMain.handle("server:delete",(_,id) => {
+handleIpc("server:delete",(_,id) => {
     return serverManager.deleteServer(id);
 });
 
-ipcMain.handle("server:sendCommand",(_,id,command) => {
+handleIpc("server:sendCommand",(_,id,command) => {
     return serverManager.sendCommand(id,command);
 });
 
-ipcMain.handle("server:getServers",(_) => {
+handleIpc("server:getServers",(_) => {
     return serverManager.getServers();
 });
 
-ipcMain.handle("server:saveProperties",(_,id,properties) => {
+handleIpc("server:saveProperties",(_,id,properties) => {
     return serverManager.saveProperties(id,properties);
 });
 
-ipcMain.handle("server:getServerInfo",(_,id) => {
+handleIpc("server:getServerInfo",(_,id) => {
     return serverManager.getServerInfo(id);
 });
 
-ipcMain.handle("server:saveServerInfo",(_,id,newKey,newValue) => {
+handleIpc("server:saveServerInfo",(_,id,newKey,newValue) => {
     return serverManager.saveServerInfo(id,newKey,newValue);
 });
 
-ipcMain.handle("server:setLogo",(_,id,pngPath) => {
+handleIpc("server:setLogo",(_,id,pngPath) => {
     return serverManager.setServerLogo(id,pngPath);
 });
 
-ipcMain.handle("server:getLogo",(_,id) => {
+handleIpc("server:getLogo",(_,id) => {
     return serverManager.getServerLogo(id);
 });
-ipcMain.handle("server:serverRunning",(_,id) => {
+handleIpc("server:serverRunning",(_,id) => {
     return serverManager.serverRunning(id);
 });
 
-ipcMain.handle("server:serverPath",(_,id) => {
+handleIpc("server:serverPath",(_,id) => {
     return serverManager.serverPath(id);
 })
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
-ipcMain.handle("version:getVanilla" ,(_) => {
+handleIpc("version:getVanilla" ,(_) => {
     return versionManager.getVanillaVersions();
 });
 
-ipcMain.handle("version:getFabric",(_) => {
+handleIpc("version:getFabric",(_) => {
     return versionManager.getFabricVersions();
 });
 
-ipcMain.handle("version:getPaper", (_) => {
+handleIpc("version:getPaper", (_) => {
     return versionManager.getPaperVersions();
 });
 
-ipcMain.handle("version:getPurpur",(_) => {
+handleIpc("version:getPurpur",(_) => {
     return versionManager.getPurpurVersions();
 });
 
-ipcMain.handle("version:getForge", (_) => {
+handleIpc("version:getForge", (_) => {
     return versionManager.getForgeVersions();
 })
 
 // ━━━━━━━━━━━━━━━━━━━━━━
 
-ipcMain.handle("network:getPublicIp", (_) => {
+handleIpc("network:getPublicIp", (_) => {
     return networkManager.getPublicIp();
 });
 
-ipcMain.handle("network:openPort", (_,port,{timeout = 0,ignoreCGNat = false} = {}) => {
+handleIpc("network:openPort", (_,port,{timeout = 0,ignoreCGNat = false} = {}) => {
     return networkManager.openPort(port,{timeout,ignoreCGNat});
 });
 
-ipcMain.handle("network:closePort",(_,port) => {
+handleIpc("network:closePort",(_,port) => {
     return networkManager.closePort(port);
 });
 
-ipcMain.handle("network:getPortMappings", (_) => {
+handleIpc("network:getPortMappings", (_) => {
     return networkManager.getPortMappings();
 });
 
-ipcMain.handle("network:getLocalIp",(_) => {
+handleIpc("network:getLocalIp",(_) => {
     return networkManager.getLocalIp();
 });

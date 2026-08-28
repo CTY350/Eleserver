@@ -1,6 +1,6 @@
 import natUpnp  from 'nat-upnp';
-import os from 'node:os'
-
+import os from 'node:os';
+import {logger} from "./LogManager.js";
 
 export class NetworkManager {
     #client;
@@ -73,7 +73,7 @@ export class NetworkManager {
     }
 
     async openPort(port,{timeout = 0, ignoreCGNat = false} = {}) {
-
+        logger.info(`Opening Port: ${port}`);
         if (!(await this.#hasUpnpGateway())) {
             const upnperr = new Error("UPNP_NOT_AVAILABLE");
             throw upnperr;
@@ -96,12 +96,14 @@ export class NetworkManager {
                     reject(err);
                     return;
                 }
+                logger.info(`Port: ${port} successfully opened`);
                 resolve();
             });
         });
     }
 
     async closePort(port) {
+        logger.info(`Closing Port: ${port}`);
         return new Promise((resolve,reject) => {
             this.#client.portUnmapping({
                 public: port
@@ -110,6 +112,7 @@ export class NetworkManager {
                     reject(err);
                     return;
                 }
+                logger.info(`Port: ${port} successfully closed`);
                 resolve();
             });
         });
