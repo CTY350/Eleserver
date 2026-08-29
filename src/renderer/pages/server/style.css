@@ -32,7 +32,7 @@ body {
     font-family: Play, sans-serif;
     font-weight: 700;
     padding: 16px;
-    padding-top: 32px;
+    padding-top: 0;
     gap: 20px;
 }
 #server-name {
@@ -340,5 +340,30 @@ body {
     width: 20px;
     height: 20px;
     user-select: none;
+}
 
+#back {
+    display: flex;
+    justify-content: flex-start;
+    height: 32px;
+    padding-top: 16px;
+    width: 95%;
+    margin: 0 auto;
+}
+#back-button {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border:none;
+    background: black;
+    user-select: none;
+    cursor: pointer;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: box-shadow 0.3s;
+}
+#back-button:hover {
+    box-shadow: 0 0 5px black;
 }

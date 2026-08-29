@@ -19,6 +19,8 @@ const portButton = document.querySelector("#port-button");
 
 const overlay = document.querySelector(".overlay");
 
+const backButton = document.querySelector("#back-button");
+
 let loading = false;
 let serverInfo;
 
@@ -180,6 +182,10 @@ serverName.addEventListener("click", async () => {
     if (result) {
         throw new Error(result);
     }
+});
+
+backButton.addEventListener("click", () => {
+    window.location.href = "../home/index.html";
 })
 
 

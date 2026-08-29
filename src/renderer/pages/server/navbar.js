@@ -8,7 +8,7 @@ const consolePage = document.querySelector("#console-page");
 
 function changePage(page) {
     if (page === "home") {
-        homePage.style.display = "flex";
+        homePage.style.display = "block";
         consolePage.style.display = "none";
     }
     else if (page === "console") {
