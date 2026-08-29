@@ -1,0 +1,46 @@
+@font-face {
+    font-family: 'Play';
+    src: url("../../assets/fonts/Play-Bold.ttf") format("truetype");
+    font-weight: 700;
+}
+
+
+html,
+body {
+    background: #121212;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+}
+#error-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: 'Play', sans-serif;
+    font-weight: 700;
+}
+
+#error-message {
+    margin: 32px;
+}
+#back-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100px;
+    height: 45px;
+    border: none;
+    border-radius: 10px;
+    transition: transform 0.3s;
+    cursor: pointer;
+}
+#back-button:hover {
+    transform: scale(1.050);
+}
+#back-button:active {
+    transform: scale(1.0);
+}

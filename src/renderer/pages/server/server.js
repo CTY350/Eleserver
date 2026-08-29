@@ -74,7 +74,14 @@ function setButton(status) {
 }
 
 async function loadPage() {
-    serverInfo = await window.server.getServerInfo(id);
+    let serverInfo;
+    try {
+        serverInfo = await window.server.getServerInfo(id);
+    }
+    catch (error) {
+        window.location.href = "../error/index.html";
+    }
+
     serverName.textContent = serverInfo.name;
     serverVersion.textContent = `${serverInfo.software} · ${serverInfo.version}`;
 
