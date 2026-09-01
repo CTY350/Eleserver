@@ -37,6 +37,8 @@ body {
     border-radius: 10px;
     transition: transform 0.3s;
     cursor: pointer;
+    font-family: Play, sans-serif;
+    font-weight: 700;
 }
 #back-button:hover {
     transform: scale(1.050);

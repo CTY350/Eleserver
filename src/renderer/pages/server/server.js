@@ -99,8 +99,6 @@ async function loadPage() {
     const publicIp = await window.network.getPublicIp();
 
     const port = serverInfo.properties["server-port"];
-    console.log(port);
-
 
     localIpText.innerText = `${localIP}:${port}`;
     publicIpText.innerText = `${publicIp}:${port}`;
@@ -121,7 +119,6 @@ overlay.addEventListener("click", (event) => {
 startButton.addEventListener("click", async () => {
     startButton.disabled = true;
     let serverRunning = await window.server.serverRunning(id);
-    console.log("server:",serverRunning);
     loading = true;
     setStatus("loading");
 

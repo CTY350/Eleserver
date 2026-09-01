@@ -10,6 +10,8 @@ import {logger,logEvents} from '../backend/managers/LogManager.js';
 import {serverEvents} from "../backend/managers/ServerManager.js";
 
 import path from "node:path";
+
+import os from "node:os";
 import {fileURLToPath} from "node:url";
 
 
@@ -17,6 +19,38 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 let win;
+
+
+
+
+function createMenuTemplate() {
+    const template = [
+        {
+            label: "DevTools",
+            click: () => {
+                win.webContents.openDevTools({mode: 'detach'});
+            }
+        },
+        {
+            label: "Reload",
+            role: "reload"
+        },
+        {
+            label: "Logs",
+            click: () => {
+                shell.openPath(path.join(os.homedir(), ".eleserver","logs"));
+            }
+        },
+        {
+            label: "About",
+            click: () => {
+                shell.openExternal("https://github.com/CTY350/Eleserver/");
+            }
+        }
+
+    ]
+    return Menu.buildFromTemplate(template);
+}
 
 function startApp() {
     initialize();
@@ -32,7 +66,7 @@ function startApp() {
             preload: path.join(__dirname, 'preload.js'),
         }
     });
-    // Menu.setApplicationMenu(null);
+    Menu.setApplicationMenu(createMenuTemplate());
     win.loadFile("src/renderer/pages/home/index.html");
 }
 
